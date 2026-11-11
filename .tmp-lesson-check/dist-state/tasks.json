@@ -1,0 +1,4 @@
+[
+  { "id": "api-1", "title": "Ôn HTML", "subject": "Web", "deadline": "2026-12-10", "completed": false },
+  { "id": "api-2", "title": "Thực hành React", "subject": "Web", "deadline": "2026-12-12", "completed": true }
+]
