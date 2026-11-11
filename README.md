@@ -111,6 +111,10 @@ Các màn có trạng thái tải, lỗi kèm thử lại, danh sách rỗng, x�
 
 ## Triển khai
 
+Trên Vercel, chọn Framework Preset **Vite**, Build Command `yarn build`, Output Directory `dist`. Root Directory để trống nếu repo chỉ chứa frontend; đặt `client` nếu repo chứa cả client và server. File `vercel.json` nằm cùng `package.json` và rewrite các đường dẫn về `/index.html`, giúp React Router xử lý khi mở link trực tiếp hoặc reload `/lookup`, `/specialized/login`, `/lecturer/...`.
+
+Sau khi cập nhật cấu hình, commit và push `vercel.json`, rồi chờ Vercel deploy commit mới. Redeploy một commit cũ chưa có file này sẽ không áp dụng bản sửa. Tham khảo [Vercel: Vite SPA deep linking](https://vercel.com/docs/frameworks/frontend/vite#using-vite-to-make-spas).
+
 `render.yaml` dành cho Static Site. Đặt Root Directory là `client` trong monorepo, build bằng `yarn install --frozen-lockfile --production=false && yarn build`, Publish Directory là `dist`.
 
 Đặt `VITE_API_URL` bằng URL backend thật trước khi build và cấu hình `FRONTEND_URL` của backend đúng origin client. Rewrite `/*` về `/index.html` để mở trực tiếp hoặc tải lại các đường dẫn lộ trình. Không đưa thông tin Gmail vào cấu hình frontend.
