@@ -12,7 +12,12 @@ import {
   Upload,
 } from 'antd';
 import type { UploadFile } from 'antd';
-import { CloudUploadOutlined, DownloadOutlined } from '@ant-design/icons';
+import {
+  CloudUploadOutlined,
+  DownloadOutlined,
+  ReloadOutlined,
+} from '@ant-design/icons';
+import GradeDisplay from '../../components/GradeDisplay';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { api, download, errorMessage, get } from '../../lib/api';
@@ -71,6 +76,7 @@ export default function SourceAssignmentPage() {
       ),
     enabled: !!assignment.data,
     staleTime: 0,
+    refetchOnWindowFocus: true,
   });
   useEffect(() => {
     const timer = window.setInterval(
@@ -350,46 +356,64 @@ export default function SourceAssignmentPage() {
                 </section>
               </div>
               <section className="surface p-6">
-                <h2 className="mb-5">Bài đã nộp</h2>
-                {!mine.data ? (
-                  <p className="text-muted">Bạn chưa nộp bài tập này.</p>
-                ) : (
-                  <Timeline
-                    items={mine.data.versions?.map((v) => ({
-                      color: v.isLatest ? 'green' : 'gray',
-                      content: (
-                        <div className="pb-5">
-                          <h3>
-                            Phiên bản {v.version}{' '}
-                            {v.isLatest && <Tag color="green">Mới nhất</Tag>}
-                          </h3>
-                          <p className="my-3 text-sm text-muted">
-                            {dateTime(v.submittedAt)} ·{' '}
-                            {v.late ? 'Trễ hạn' : 'Đúng hạn'}
-                          </p>
-                          {v.note && (
-                            <p className="mb-3 whitespace-pre-wrap">{v.note}</p>
-                          )}
-                          <FileList
-                            files={v.files}
-                            action={(f, i) => (
-                              <Button
-                                icon={<DownloadOutlined />}
-                                aria-label={`Tải ${f.originalName} phiên bản ${v.version}`}
-                                size="small"
-                                disabled={!!downloading}
-                                loading={downloading === `${v.version}-${i}`}
-                                onClick={() =>
-                                  void saveFile(v.version, i, f.originalName)
-                                }
-                              />
+                <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+                  <h2 className="m-0">Bài đã nộp & điểm</h2>
+                  <Button
+                    icon={<ReloadOutlined />}
+                    loading={mine.isFetching}
+                    onClick={() => void mine.refetch()}
+                  >
+                    Làm mới kết quả
+                  </Button>
+                </div>
+                <QueryState
+                  pending={mine.isPending}
+                  error={mine.error}
+                  retry={() => void mine.refetch()}
+                >
+                  {!mine.data ? (
+                    <p className="text-muted">Bạn chưa nộp bài tập này.</p>
+                  ) : (
+                    <Timeline
+                      items={mine.data.versions?.map((v) => ({
+                        color: v.isLatest ? 'green' : 'gray',
+                        content: (
+                          <div className="pb-5">
+                            <h3>
+                              Phiên bản {v.version}{' '}
+                              {v.isLatest && <Tag color="green">Mới nhất</Tag>}
+                            </h3>
+                            <GradeDisplay grade={v.grade} />
+                            <p className="my-3 text-sm text-muted">
+                              {dateTime(v.submittedAt)} ·{' '}
+                              {v.late ? 'Trễ hạn' : 'Đúng hạn'}
+                            </p>
+                            {v.note && (
+                              <p className="mb-3 whitespace-pre-wrap">
+                                {v.note}
+                              </p>
                             )}
-                          />
-                        </div>
-                      ),
-                    }))}
-                  />
-                )}
+                            <FileList
+                              files={v.files}
+                              action={(f, i) => (
+                                <Button
+                                  icon={<DownloadOutlined />}
+                                  aria-label={`Tải ${f.originalName} phiên bản ${v.version}`}
+                                  size="small"
+                                  disabled={!!downloading}
+                                  loading={downloading === `${v.version}-${i}`}
+                                  onClick={() =>
+                                    void saveFile(v.version, i, f.originalName)
+                                  }
+                                />
+                              )}
+                            />
+                          </div>
+                        ),
+                      }))}
+                    />
+                  )}
+                </QueryState>
               </section>
             </div>
           </>

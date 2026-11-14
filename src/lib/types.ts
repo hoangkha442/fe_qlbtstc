@@ -60,6 +60,20 @@ export interface SubmissionFile {
   uploadedAt?: string;
   downloadPath?: string;
 }
+export interface SubmissionGrade {
+  score: number;
+  feedback: string;
+  gradedAt: string;
+  revision: number;
+}
+export interface GradeSubmissionResult {
+  submissionId: string;
+  version: number;
+  grade: SubmissionGrade;
+  emailRequested: boolean;
+  emailSent: boolean;
+  message: string;
+}
 export interface Version {
   version: number;
   isLatest: boolean;
@@ -69,6 +83,7 @@ export interface Version {
   submittedAt: string;
   late: boolean;
   files: SubmissionFile[];
+  grade?: SubmissionGrade | null;
 }
 export interface Receipt extends Version {
   receiptCode: string;
@@ -86,6 +101,7 @@ export interface Receipt extends Version {
   message?: string;
 }
 export interface Submission extends Entity {
+  grade?: SubmissionGrade | null;
   assignmentId: string;
   courseSectionId: string;
   studentCodeNormalized: string;

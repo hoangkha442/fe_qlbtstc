@@ -1,4 +1,6 @@
 import AllSelect from '../../components/AllSelect';
+import GradingForm from '../../components/GradingForm';
+import { GradeTag } from '../../components/GradeDisplay';
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -211,6 +213,11 @@ export default function SpecializedSubmissionsPage() {
                 dataIndex: 'latestVersion',
               },
               {
+                title: 'ĐIỂM',
+                key: 'grade',
+                render: (_, s) => <GradeTag grade={s.grade} />,
+              },
+              {
                 title: 'TRẠNG THÁI',
                 key: 'late',
                 render: (_, s) => (
@@ -276,6 +283,11 @@ export default function SpecializedSubmissionsPage() {
                         Phiên bản {v.version}{' '}
                         {v.isLatest && <Tag color="green">Mới nhất</Tag>}
                       </h3>
+                      <GradingForm
+                        key={`${selected}-${v.version}`}
+                        submissionId={selected!}
+                        version={v}
+                      />
                       <p className="my-3 text-muted">
                         {dateTime(v.submittedAt)} ·{' '}
                         {v.late ? 'Trễ hạn' : 'Đúng hạn'}

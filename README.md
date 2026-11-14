@@ -111,6 +111,12 @@ Mật khẩu, mã bí mật của biên nhận và file binary không nằm tron
 
 Các màn có trạng thái tải, lỗi kèm thử lại, danh sách rỗng, xác nhận thao tác ảnh hưởng quyền học và thông báo kết quả. Giao diện hỗ trợ điện thoại. Thời gian bài nộp hiển thị theo giờ Việt Nam.
 
+## Chấm điểm và kết quả học tập
+
+Trong Bài nộp Đại cương hoặc Bài nộp mã nguồn, giảng viên mở chi tiết, chọn Chấm điểm tại phiên bản cần chấm, nhập điểm thang 10 và nhận xét rồi Lưu điểm. Ô gửi email mặc định không chọn; nếu chọn, hệ thống gửi tới email hiển thị của phiên bản đó. Thông báo phân biệt lưu điểm thành công với lưu điểm nhưng gửi email thất bại. Khi có xung đột cập nhật, dữ liệu được tải lại để chấm tiếp từ điểm mới nhất.
+
+Danh sách hiển thị điểm phiên bản mới nhất hoặc Chưa chấm. Đại cương tra cứu bằng mã biên nhận và mã bí mật để xem điểm/nhận xét từng phiên bản và lưu kết quả vào biên nhận. Sinh viên Chuyên ngành mở bài tập để xem phần Bài đã nộp & điểm; có nút Làm mới kết quả và tự kiểm tra lại khi quay lại cửa sổ. Phiên bản mới nộp lại không kế thừa điểm cũ. Kết quả hiển thị dù giảng viên không chọn gửi email.
+
 ## Triển khai
 
 Trên Vercel, chọn Framework Preset **Vite**, Build Command `yarn build`, Output Directory `dist`. Root Directory để trống nếu repo chỉ chứa frontend; đặt `client` nếu repo chứa cả client và server. File `vercel.json` nằm cùng `package.json` và rewrite các đường dẫn về `/index.html`, giúp React Router xử lý khi mở link trực tiếp hoặc reload `/lookup`, `/specialized/login`, `/lecturer/...`.

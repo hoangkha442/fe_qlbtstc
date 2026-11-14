@@ -1,4 +1,6 @@
 import AllSelect from '../../components/AllSelect';
+import GradingForm from '../../components/GradingForm';
+import { GradeTag } from '../../components/GradeDisplay';
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -265,7 +267,7 @@ export default function SubmissionsPage() {
           <Table<Submission>
             rowKey="_id"
             scroll={{
-              x: 1080,
+              x: 1200,
             }}
             dataSource={list.data?.items}
             pagination={{
@@ -379,6 +381,12 @@ export default function SubmissionsPage() {
                 ),
               },
               {
+                title: 'ĐIỂM',
+                key: 'grade',
+                width: 120,
+                render: (_, s) => <GradeTag grade={s.grade} />,
+              },
+              {
                 title: '',
                 key: 'action',
                 width: 70,
@@ -485,6 +493,11 @@ export default function SubmissionsPage() {
                           {v.late ? 'Trễ hạn' : 'Đúng hạn'}
                         </Tag>
                       </div>
+                      <GradingForm
+                        key={`${selectedId}-${v.version}`}
+                        submissionId={selectedId!}
+                        version={v}
+                      />
                       <p className="mt-2 mb-4 text-sm text-muted">
                         {dateTime(v.submittedAt)} · {v.fullName}
                         {v.email ? ` · ${v.email}` : ''}

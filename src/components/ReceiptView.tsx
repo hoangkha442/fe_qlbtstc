@@ -20,6 +20,7 @@ import { dateTime, refName } from '../lib/utils';
 import { downloadReceiptFile, errorMessage, saveBlob } from '../lib/api';
 import { FileList } from './common';
 import { brand } from '../lib/brand';
+import GradeDisplay from './GradeDisplay';
 
 export default function ReceiptView({
   receipt,
@@ -93,6 +94,13 @@ export default function ReceiptView({
       `Thời gian: ${dateTime(receipt.submittedAt)}`,
       `Phiên bản: ${receipt.version}`,
       `Trạng thái: ${receipt.late ? 'Trễ hạn' : 'Đúng hạn'}`,
+      ...(receipt.grade
+        ? [
+            `Điểm: ${receipt.grade.score}/10`,
+            `Nhận xét: ${receipt.grade.feedback || 'Không có nhận xét.'}`,
+            `Chấm lúc: ${dateTime(receipt.grade.gradedAt)}`,
+          ]
+        : ['Điểm: Chưa chấm']),
       '',
       'File đã nộp:',
       ...receipt.files.map((f) => `- ${f.originalName} (${f.bytes} byte)`),
@@ -222,6 +230,7 @@ export default function ReceiptView({
             },
           ]}
         />
+        <GradeDisplay grade={receipt.grade} />
         <h3 className="mt-7 mb-4">File đã nộp</h3>
         <FileList files={receipt.files} action={fileAction(receipt.version)} />
         {receipt.note && (
@@ -282,6 +291,7 @@ export default function ReceiptView({
                     <p className="mb-3 text-sm text-muted">Email: {v.email}</p>
                   )}
                   <FileList files={v.files} action={fileAction(v.version)} />
+                  <GradeDisplay grade={v.grade} />
                 </div>
               ),
             }))}
