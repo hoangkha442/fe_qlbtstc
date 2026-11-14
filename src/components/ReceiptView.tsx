@@ -27,15 +27,19 @@ export default function ReceiptView({
   secret,
   success = false,
   onReturn,
+  onResubmit,
+  resubmitDisabled,
   accessSecret,
   onResendEmail,
   emailBusy = false,
-  returnLabel = 'Đến bài tập / Nộp lại',
+  returnLabel = 'Xem bài tập',
 }: {
   receipt: Receipt;
   secret?: string;
   success?: boolean;
   onReturn?: () => void;
+  onResubmit?: () => void;
+  resubmitDisabled?: boolean;
   accessSecret?: string;
   onResendEmail?: () => void;
   emailBusy?: boolean;
@@ -44,6 +48,8 @@ export default function ReceiptView({
   const { message } = App.useApp();
   const [downloading, setDownloading] = useState('');
   const code = secret ?? accessSecret;
+  const resubmissionBlocked =
+    resubmitDisabled ?? !receipt.resubmission?.allowed;
   async function downloadFile(
     file: SubmissionFile,
     version: number,
@@ -237,6 +243,15 @@ export default function ReceiptView({
           <div className="mt-5 text-muted">Ghi chú: {receipt.note}</div>
         )}
         <div className="receipt-actions">
+          {onResubmit && (
+            <Button
+              icon={<ReloadOutlined />}
+              onClick={onResubmit}
+              disabled={emailBusy || resubmissionBlocked}
+            >
+              Nộp lại bài
+            </Button>
+          )}
           <Button
             type="primary"
             icon={<DownloadOutlined />}
@@ -258,6 +273,12 @@ export default function ReceiptView({
             </Link>
           )}
         </div>
+        {onResubmit && resubmissionBlocked && (
+          <p className="mb-5 text-sm text-muted">
+            {receipt.resubmission?.reason ??
+              'Bài tập hiện không nhận bài nộp lại. Vui lòng kiểm tra thời hạn hoặc liên hệ giảng viên.'}
+          </p>
+        )}
         <Alert
           type="info"
           showIcon

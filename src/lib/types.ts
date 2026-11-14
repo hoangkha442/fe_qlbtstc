@@ -86,6 +86,7 @@ export interface Version {
   grade?: SubmissionGrade | null;
 }
 export interface Receipt extends Version {
+  resubmission?: { allowed: boolean; reason: string | null };
   receiptCode: string;
   submissionId: string;
   studentCode: string;
@@ -101,6 +102,7 @@ export interface Receipt extends Version {
   message?: string;
 }
 export interface Submission extends Entity {
+  resubmission?: { allowed: boolean; reason: string | null };
   grade?: SubmissionGrade | null;
   assignmentId: string;
   courseSectionId: string;

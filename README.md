@@ -111,6 +111,14 @@ Mật khẩu, mã bí mật của biên nhận và file binary không nằm tron
 
 Các màn có trạng thái tải, lỗi kèm thử lại, danh sách rỗng, xác nhận thao tác ảnh hưởng quyền học và thông báo kết quả. Giao diện hỗ trợ điện thoại. Thời gian bài nộp hiển thị theo giờ Việt Nam.
 
+## Nộp lại bài đã gửi nhầm
+
+Đại cương: bấm Nộp lại bài ngay trên biên nhận sau khi nộp, hoặc tra cứu bằng mã biên nhận và mã bí mật rồi bấm Nộp lại bài. Form điền sẵn thông tin và mã bí mật, giữ nguyên MSSV; chọn lại toàn bộ file đúng rồi xác nhận. Mã bí mật được chuyển giữa hai trang trong bộ nhớ, không đặt vào URL, lịch sử điều hướng, localStorage hoặc sessionStorage. Nếu reload form, nhập lại mã bí mật hoặc tra cứu lại.
+
+Chuyên ngành: mở bài tập → Bài đã nộp & điểm → Nộp lại bài, chọn ZIP đúng và xác nhận hộp thoại trước khi gửi; không cần mã bí mật. Có thể hủy hộp thoại để kiểm tra file, chưa phát sinh yêu cầu nộp bài.
+
+Cả hai luồng chỉ nộp lại khi giảng viên đã bật Cho nộp lại và bài còn nhận bài. Khi không được phép, giao diện khóa nút và nêu lý do. Nộp lại tạo phiên bản mới chưa chấm, giữ bản/điểm cũ trong lịch sử; thử lại yêu cầu lỗi vẫn dùng cùng key và nội dung để tránh tạo trùng phiên bản.
+
 ## Chấm điểm và kết quả học tập
 
 Trong Bài nộp Đại cương hoặc Bài nộp mã nguồn, giảng viên mở chi tiết, chọn Chấm điểm tại phiên bản cần chấm, nhập điểm thang 10 và nhận xét rồi Lưu điểm. Ô gửi email mặc định không chọn; nếu chọn, hệ thống gửi tới email hiển thị của phiên bản đó. Thông báo phân biệt lưu điểm thành công với lưu điểm nhưng gửi email thất bại. Khi có xung đột cập nhật, dữ liệu được tải lại để chấm tiếp từ điểm mới nhất.

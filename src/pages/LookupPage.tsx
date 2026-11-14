@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useResubmission } from '../lib/resubmission-context';
 import { Alert, Button, Form, Input } from 'antd';
 import {
   FileSearchOutlined,
@@ -11,6 +13,8 @@ import ReceiptView from '../components/ReceiptView';
 import { PageHeading } from '../components/common';
 
 export default function LookupPage() {
+  const navigate = useNavigate();
+  const { prepare } = useResubmission();
   const [receipt, setReceipt] = useState<Receipt>();
   const [accessSecret, setAccessSecret] = useState('');
   const [loading, setLoading] = useState(false);
@@ -117,7 +121,26 @@ export default function LookupPage() {
         </section>
         <div className="lookup-result">
           {receipt ? (
-            <ReceiptView receipt={receipt} accessSecret={accessSecret} />
+            <ReceiptView
+              receipt={receipt}
+              accessSecret={accessSecret}
+              onResubmit={() => {
+                if (!receipt.resubmission?.allowed) return;
+                prepare({
+                  assignmentId: receipt.assignment.id,
+                  receiptCode: receipt.receiptCode,
+                  latestVersion: receipt.latestVersion,
+                  fields: {
+                    studentCode: receipt.studentCode,
+                    fullName: receipt.fullName,
+                    email: receipt.email ?? '',
+                    secret: accessSecret,
+                    note: '',
+                  },
+                });
+                navigate(`/assignments/${receipt.assignment.id}`);
+              }}
+            />
           ) : (
             <div className="lookup-placeholder">
               <div className="lookup-illustration">

@@ -7,6 +7,7 @@ import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import StudentLayout from './components/StudentLayout';
 import LecturerLayout from './components/LecturerLayout';
 import StudentGuard from './components/StudentGuard';
+import { ResubmissionProvider } from './lib/resubmission-context';
 
 const HomePage = lazy(() => import('./pages/HomePage'));
 const AssignmentPage = lazy(() => import('./pages/AssignmentPage'));
@@ -84,6 +85,13 @@ function RouteEffects() {
   return null;
 }
 export default function App() {
+  return (
+    <ResubmissionProvider>
+      <AppRoutes />
+    </ResubmissionProvider>
+  );
+}
+function AppRoutes() {
   return (
     <ErrorBoundary>
       <RouteEffects />

@@ -49,7 +49,7 @@ type Attempt = {
 export default function SourceAssignmentPage() {
   const { id = '' } = useParams();
   const { student } = useStudentAuth();
-  const { notification } = App.useApp();
+  const { notification, modal } = App.useApp();
   const client = useQueryClient();
   const [form] = Form.useForm<{ note?: string }>();
   const [files, setFiles] = useState<UploadFile[]>([]);
@@ -60,6 +60,7 @@ export default function SourceAssignmentPage() {
   const [retryAt, setRetryAt] = useState(0);
   const [now, setNow] = useState(() => Date.now());
   const sending = useRef(false);
+  const uploadSection = useRef<HTMLElement>(null);
   const assignment = useQuery({
     queryKey: ['student', 'source-assignment', id],
     queryFn: ({ signal }) =>
@@ -104,6 +105,40 @@ export default function SourceAssignmentPage() {
   const wait = Math.max(0, Math.ceil((retryAt - now) / 1000));
   const blocked = !status?.accepting || (!!mine.data && !a?.allowResubmit);
   const cannotSend = blocked && !attempt;
+  function review(values: { note?: string }) {
+    if (busy || sending.current || wait > 0) return;
+    if (!attempt && blocked) {
+      notification.warning({
+        title: 'Hiện chưa thể nộp lại',
+        description:
+          mine.data?.resubmission?.reason ??
+          'Kiểm tra thời hạn và quyền nộp lại của bài tập.',
+      });
+      return;
+    }
+    const file = (files[0]?.originFileObj ?? files[0]) as File | undefined;
+    if (!attempt && !file) {
+      notification.warning({ title: 'Vui lòng chọn file ZIP mã nguồn' });
+      return;
+    }
+    if (mine.data && !attempt) {
+      modal.confirm({
+        title: `Xác nhận nộp lại bài · phiên bản ${mine.data.latestVersion + 1}`,
+        content: (
+          <div>
+            <p className="break-words font-medium">{file?.name}</p>
+            <p>
+              Phiên bản mới thay thế bài hiện tại để chấm. Bản cũ và điểm cũ vẫn
+              được giữ trong lịch sử.
+            </p>
+          </div>
+        ),
+        okText: 'Xác nhận nộp lại',
+        cancelText: 'Kiểm tra lại',
+        onOk: () => submit(values),
+      });
+    } else void submit(values);
+  }
   async function submit(values: { note?: string }) {
     if (!student || !a || sending.current || wait > 0) return;
     const file = (files[0]?.originFileObj ?? files[0]) as File | undefined;
@@ -226,8 +261,16 @@ export default function SourceAssignmentPage() {
                     {a.instructions || 'Giảng viên chưa thêm yêu cầu chi tiết.'}
                   </LearningText>
                 </section>
-                <section className="surface p-6">
-                  <h2 className="mb-5">Nộp mã nguồn</h2>
+                <section className="surface p-6" ref={uploadSection}>
+                  <h2 className="mb-5">
+                    {mine.data ? 'Nộp lại mã nguồn' : 'Nộp mã nguồn'}
+                  </h2>
+                  {mine.data && a.allowResubmit && (
+                    <p className="mb-5 text-muted">
+                      Chọn file ZIP đúng để nộp phiên bản mới. Bài và điểm cũ
+                      được giữ trong lịch sử.
+                    </p>
+                  )}
                   {!a.allowResubmit && (
                     <div className="mb-5">
                       <ImportantNotice title="Quan trọng · Chỉ được nộp một lần">
@@ -285,7 +328,7 @@ export default function SourceAssignmentPage() {
                   <Form
                     form={form}
                     layout="vertical"
-                    onFinish={submit}
+                    onFinish={review}
                     disabled={busy || cannotSend}
                     requiredMark={false}
                   >
@@ -349,7 +392,7 @@ export default function SourceAssignmentPage() {
                         : attempt
                           ? 'Thử lại cùng yêu cầu'
                           : mine.data
-                            ? 'Nộp phiên bản mới'
+                            ? 'Nộp lại bài'
                             : 'Nộp bài tập'}
                     </Button>
                   </Form>
@@ -358,14 +401,39 @@ export default function SourceAssignmentPage() {
               <section className="surface p-6">
                 <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
                   <h2 className="m-0">Bài đã nộp & điểm</h2>
-                  <Button
-                    icon={<ReloadOutlined />}
-                    loading={mine.isFetching}
-                    onClick={() => void mine.refetch()}
-                  >
-                    Làm mới kết quả
-                  </Button>
+                  <div className="flex flex-wrap gap-3">
+                    {mine.data && (
+                      <Button
+                        type="primary"
+                        icon={<ReloadOutlined />}
+                        disabled={busy || !!attempt || blocked}
+                        onClick={() => {
+                          uploadSection.current?.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start',
+                          });
+                          notification.info({
+                            title: 'Chọn file ZIP đúng để nộp lại',
+                          });
+                        }}
+                      >
+                        Nộp lại bài
+                      </Button>
+                    )}
+                    <Button
+                      icon={<ReloadOutlined />}
+                      loading={mine.isFetching}
+                      onClick={() => void mine.refetch()}
+                    >
+                      Làm mới kết quả
+                    </Button>
+                  </div>
                 </div>
+                {mine.data?.resubmission && !mine.data.resubmission.allowed && (
+                  <p className="mb-4 text-sm text-muted">
+                    {mine.data.resubmission.reason}
+                  </p>
+                )}
                 <QueryState
                   pending={mine.isPending}
                   error={mine.error}

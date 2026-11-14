@@ -39,6 +39,7 @@ import {
 } from '../components/common';
 import ReceiptView from '../components/ReceiptView';
 import { LearningText } from '../components/LearningContent';
+import { useResubmission } from '../lib/resubmission-context';
 
 interface Attempt {
   fields: StudentFields;
@@ -49,6 +50,12 @@ interface Attempt {
 export default function AssignmentPage() {
   const { id = '' } = useParams();
   const { message } = App.useApp();
+  const { draft: resubmissionDraft, clear: clearResubmissionDraft } =
+    useResubmission();
+  const [resubmissionSource, setResubmissionSource] = useState<{
+    receiptCode: string;
+    latestVersion: number;
+  }>();
   const [form] = Form.useForm<StudentFields>();
   const assignment = useQuery({
     queryKey: ['public', 'assignment', id],
@@ -93,6 +100,18 @@ export default function AssignmentPage() {
   const status = a ? statusOf(a, now + serverOffset) : undefined;
   const rawFiles = files.map((f) => (f.originFileObj ?? f) as File);
   const retrySeconds = Math.max(0, Math.ceil((retryAt - now) / 1000));
+  useEffect(() => {
+    if (!a || !resubmissionDraft || resubmissionDraft.assignmentId !== id)
+      return;
+    setResubmissionSource({
+      receiptCode: resubmissionDraft.receiptCode,
+      latestVersion: resubmissionDraft.latestVersion,
+    });
+    setResubmit(true);
+    setFiles([]);
+    form.setFieldsValue(resubmissionDraft.fields);
+    clearResubmissionDraft();
+  }, [a, id, resubmissionDraft, form, clearResubmissionDraft]);
   function review(values: StudentFields) {
     if (!rawFiles.length) {
       void message.warning('Vui lòng chọn ít nhất một file để nộp.');
@@ -100,6 +119,10 @@ export default function AssignmentPage() {
     }
     if (!status?.accepting) {
       void message.warning('Bài tập hiện không nhận bài.');
+      return;
+    }
+    if (resubmit && !a?.allowResubmit) {
+      void message.warning('Giảng viên chưa cho phép nộp lại bài tập này.');
       return;
     }
     setDraft({
@@ -156,6 +179,11 @@ export default function AssignmentPage() {
       );
       setConfirm(false);
       setAttempt(undefined);
+      void message.success(
+        resubmit
+          ? `Đã nộp lại bài, phiên bản ${response.data.version}.`
+          : 'Đã nộp bài thành công.',
+      );
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err) {
       setError(errorMessage(err));
@@ -203,6 +231,36 @@ export default function AssignmentPage() {
       setEmailBusy(false);
     }
   }
+  function returnToForm() {
+    if (!receipt) return;
+    const fields = {
+      studentCode: receipt.studentCode,
+      fullName: receipt.fullName,
+      email: receipt.email ?? draft?.email ?? '',
+      note: '',
+      secret: receipt.secret ?? draft?.secret,
+    };
+    setResubmissionSource({
+      receiptCode: receipt.receiptCode,
+      latestVersion: receipt.latestVersion,
+    });
+    setReceipt(undefined);
+    setEmailAttempt(undefined);
+    setFiles([]);
+    setResubmit(true);
+    setDraft(undefined);
+    setAttempt(undefined);
+    setConfirmed(false);
+    setError('');
+    setProgress(0);
+    setRetryAt(0);
+    window.setTimeout(() => {
+      form.resetFields();
+      form.setFieldsValue(fields);
+    }, 0);
+    void assignment.refetch();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
   if (receipt)
     return (
       <ReceiptView
@@ -211,32 +269,10 @@ export default function AssignmentPage() {
         success
         onResendEmail={emailAttempt ? () => void resendEmail() : undefined}
         emailBusy={emailBusy}
-        returnLabel={a?.allowResubmit ? 'Nộp lại bài' : 'Xem lại bài tập'}
-        onReturn={() => {
-          const savedSecret = receipt.secret ?? draft?.secret;
-          const fields = {
-            studentCode: receipt.studentCode,
-            fullName: receipt.fullName,
-            email: receipt.email ?? draft?.email ?? '',
-            note: '',
-            secret: savedSecret,
-          };
-          setReceipt(undefined);
-          setEmailAttempt(undefined);
-          setFiles([]);
-          setResubmit(!!a?.allowResubmit);
-          setDraft(undefined);
-          setAttempt(undefined);
-          setConfirmed(false);
-          setError('');
-          setProgress(0);
-          window.setTimeout(() => {
-            form.resetFields();
-            form.setFieldsValue(fields);
-          }, 0);
-          void assignment.refetch();
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        }}
+        onResubmit={returnToForm}
+        resubmitDisabled={!a?.allowResubmit || !status?.accepting}
+        returnLabel="Xem bài tập"
+        onReturn={returnToForm}
       />
     );
   return (
@@ -322,9 +358,35 @@ export default function AssignmentPage() {
                     layout="vertical"
                     onFinish={review}
                     requiredMark="optional"
-                    disabled={!status.accepting || busy || !!attempt}
+                    disabled={
+                      !status.accepting ||
+                      busy ||
+                      !!attempt ||
+                      (resubmit && !a.allowResubmit)
+                    }
                     scrollToFirstError
                   >
+                    {resubmissionSource && (
+                      <Alert
+                        className="mb-5"
+                        type={
+                          a.allowResubmit && status.accepting
+                            ? 'info'
+                            : 'warning'
+                        }
+                        showIcon
+                        title={
+                          a.allowResubmit && status.accepting
+                            ? `Nộp lại bài · phiên bản ${resubmissionSource.latestVersion + 1}`
+                            : 'Hiện chưa thể nộp lại bài'
+                        }
+                        description={
+                          a.allowResubmit && status.accepting
+                            ? 'Chọn lại toàn bộ file đúng. Bản cũ và điểm cũ được giữ trong lịch sử; phiên bản mới sẽ được chấm riêng.'
+                            : 'Liên hệ giảng viên để mở quyền nộp lại hoặc thời hạn nộp bài.'
+                        }
+                      />
+                    )}
                     <div className="grid gap-x-5 sm:grid-cols-2">
                       <Form.Item
                         name="studentCode"
@@ -345,6 +407,12 @@ export default function AssignmentPage() {
                         <Input
                           size="large"
                           placeholder="Ví dụ: 26SV001"
+                          disabled={
+                            !!resubmissionSource ||
+                            !status.accepting ||
+                            busy ||
+                            !!attempt
+                          }
                           autoComplete="off"
                         />
                       </Form.Item>
@@ -413,6 +481,12 @@ export default function AssignmentPage() {
                       <div className="resubmit-panel">
                         <Checkbox
                           checked={resubmit}
+                          disabled={
+                            !!resubmissionSource ||
+                            !status.accepting ||
+                            busy ||
+                            !!attempt
+                          }
                           onChange={(event) =>
                             setResubmit(event.target.checked)
                           }
@@ -569,7 +643,7 @@ export default function AssignmentPage() {
               </aside>
             </div>
             <Modal
-              title="Xác nhận nộp bài"
+              title={resubmit ? 'Xác nhận nộp lại bài' : 'Xác nhận nộp bài'}
               open={confirm}
               width={680}
               closable={!busy}
@@ -594,7 +668,9 @@ export default function AssignmentPage() {
                       ? `Thử lại sau ${retrySeconds} giây`
                       : attempt && error
                         ? 'Thử lại cùng yêu cầu'
-                        : 'Xác nhận nộp bài'}
+                        : resubmit
+                          ? 'Xác nhận nộp lại'
+                          : 'Xác nhận nộp bài'}
                   </Button>
                 </div>
               }
@@ -602,6 +678,15 @@ export default function AssignmentPage() {
               <p className="mb-5 text-muted">
                 Kiểm tra đúng nơi nộp, thông tin và file trước khi gửi.
               </p>
+              {resubmit && (
+                <Alert
+                  className="mb-5"
+                  type="info"
+                  showIcon
+                  title="Lần nộp này tạo một phiên bản mới"
+                  description="Kiểm tra lại toàn bộ file thay thế. Bản cũ và điểm cũ vẫn nằm trong lịch sử; bản mới sẽ được chấm riêng."
+                />
+              )}
               <Descriptions
                 size="small"
                 column={1}
