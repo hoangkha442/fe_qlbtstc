@@ -5,6 +5,7 @@ import {
   FileExcelOutlined,
   FilePptOutlined,
   FileWordOutlined,
+  FileImageOutlined,
   ReloadOutlined,
   ExclamationCircleFilled,
   ExclamationCircleOutlined,
@@ -16,7 +17,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import type { ReactNode } from 'react';
 import type { AssignmentStatus, SubmissionFile } from '../lib/types';
 import { errorMessage } from '../lib/api';
-import { extensionColors, formatBytes } from '../lib/utils';
+import { extensionColors, formatBytes, imageExtensions } from '../lib/utils';
 import { brand } from '../lib/brand';
 
 export function Brand({
@@ -165,7 +166,9 @@ export function FileIcon({
         ? FileExcelOutlined
         : format.startsWith('ppt')
           ? FilePptOutlined
-          : FileWordOutlined;
+          : imageExtensions.includes(format)
+            ? FileImageOutlined
+            : FileWordOutlined;
   return (
     <span
       className={small ? 'file-icon small' : 'file-icon'}

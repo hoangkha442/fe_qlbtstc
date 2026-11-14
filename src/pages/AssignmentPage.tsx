@@ -456,6 +456,7 @@ export default function AssignmentPage() {
                     <Upload.Dragger
                       className="submission-uploader"
                       multiple
+                      listType="picture"
                       accept={a.allowedExtensions.map((e) => `.${e}`).join(',')}
                       fileList={files}
                       disabled={!status.accepting || busy || !!attempt}

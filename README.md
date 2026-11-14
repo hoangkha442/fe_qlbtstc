@@ -29,7 +29,7 @@ Build: `yarn build`. Kiểm tra mã: `yarn lint`. Kiểm tra cả mã và build:
 
 Chọn Đại cương tại trang chủ, lọc học kỳ → lớp → học phần → bài tập. Sinh viên không cần tài khoản.
 
-- Nhập MSSV, họ tên, **email nhận mã**, ghi chú nếu có và file Office. Client kiểm tra phần mở rộng, file rỗng, số lượng và dung lượng; backend kiểm tra nội dung thật của file.
+- Nhập MSSV, họ tên, **email nhận mã**, ghi chú nếu có và file Office hoặc ảnh theo quy định bài tập. Hỗ trợ ảnh JPG/JPEG, PNG, WebP, GIF, AVIF, TIF/TIFF; danh sách chọn file có ảnh thu nhỏ với định dạng trình duyệt hiển thị được. Client kiểm tra phần mở rộng, file rỗng, số lượng và dung lượng; backend kiểm tra nội dung thật của file.
 - Màn xác nhận hiển thị đầy đủ nơi nộp, email và danh sách file trước khi gửi.
 - Khi nộp thành công, hiển thị biên nhận, mã bí mật, email nhận mã và kết quả gửi email. Có thể tải biên nhận `.txt`, sao chép mã và tải lại file đã nộp.
 - Nếu gửi email lỗi nhưng bài đã lưu, hiển thị cảnh báo riêng và nút **Gửi lại mã qua email**. Nút dùng lại cùng nội dung và `Idempotency-Key`, không tạo phiên bản mới. File để gửi lại chỉ giữ trong bộ nhớ của trang; sau khi rời trang, dùng biên nhận đã lưu hoặc email đã nhận để tra cứu.
@@ -60,6 +60,8 @@ Menu tài khoản có đổi mật khẩu và đăng xuất. Đăng xuất gọi
 Đăng nhập ở `/login` bằng tài khoản được cấp từ backend.
 
 Phần **Đại cương** giữ các màn tổng quan, học kỳ, môn học, lớp, học phần, bài tập, bài nộp, tải file và xuất ZIP/Excel. Chi tiết bài nộp và từng phiên bản hiển thị email sinh viên.
+
+Trong Tạo/Sửa bài tập → Quy định file, các định dạng được chia thành **Tài liệu Office** và **Hình ảnh**. Bài tập mới chọn sẵn cả hai nhóm; có thể bỏ các loại không nhận. Bài tập cũ giữ lựa chọn đã lưu, giảng viên cần bật thêm ảnh rồi lưu để sinh viên nộp được. Ảnh được lưu/tải theo cùng luồng bài nộp, biên nhận và lịch sử; không cần cấu hình môi trường mới.
 
 Phần **Chuyên ngành** có:
 

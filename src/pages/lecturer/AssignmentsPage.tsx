@@ -36,6 +36,9 @@ import {
   dateTime,
   dayjs,
   formatBytes,
+  generalSubmissionExtensions,
+  imageExtensions,
+  officeExtensions,
   refName,
   statusOf,
   TIMEZONE,
@@ -508,7 +511,7 @@ function AssignmentEditor({
             manuallyClosed: false,
             allowLate: false,
             allowResubmit: false,
-            allowedExtensions: ['doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx'],
+            allowedExtensions: generalSubmissionExtensions,
             maxFiles: 5,
             maxFileMB: 10,
             opensAt: dayjs().tz(TIMEZONE),
@@ -644,6 +647,7 @@ function AssignmentEditor({
           <Form.Item
             label="Định dạng được chấp nhận"
             name="allowedExtensions"
+            extra="Sinh viên chỉ được nộp các định dạng bạn chọn bên dưới."
             rules={[
               {
                 required: true,
@@ -653,14 +657,28 @@ function AssignmentEditor({
               },
             ]}
           >
-            <Checkbox.Group
-              options={['doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx'].map(
-                (e) => ({
-                  label: `.${e}`,
-                  value: e,
-                }),
-              )}
-            />
+            <Checkbox.Group className="flex flex-col gap-4">
+              <div>
+                <div className="mb-2 font-medium">Tài liệu Office</div>
+                <div className="flex flex-wrap gap-x-4 gap-y-2">
+                  {officeExtensions.map((extension) => (
+                    <Checkbox key={extension} value={extension}>
+                      .{extension}
+                    </Checkbox>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <div className="mb-2 font-medium">Hình ảnh</div>
+                <div className="flex flex-wrap gap-x-4 gap-y-2">
+                  {imageExtensions.map((extension) => (
+                    <Checkbox key={extension} value={extension}>
+                      .{extension}
+                    </Checkbox>
+                  ))}
+                </div>
+              </div>
+            </Checkbox.Group>
           </Form.Item>
           <div className="grid grid-cols-2 gap-5">
             <Form.Item

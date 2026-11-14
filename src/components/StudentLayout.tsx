@@ -165,7 +165,7 @@ export default function StudentLayout() {
               key: '2',
               label: '2. Chuẩn bị file',
               children:
-                'Hệ thống hỗ trợ Word, Excel và PowerPoint. Kiểm tra định dạng, số lượng và dung lượng được giảng viên cho phép. Không nộp file có macro hoặc mật khẩu.',
+                'Hệ thống hỗ trợ Word, Excel, PowerPoint và ảnh JPG/JPEG, PNG, WebP, GIF, AVIF, TIFF. Kiểm tra các định dạng, số lượng và dung lượng được giảng viên cho phép.',
             },
             {
               key: '3',

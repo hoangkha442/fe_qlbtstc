@@ -52,7 +52,30 @@ export const extensionColors: Record<string, string> = {
   xlsx: '#21805b',
   ppt: '#d86b3b',
   pptx: '#d86b3b',
+  jpg: '#526477',
+  jpeg: '#526477',
+  png: '#526477',
+  webp: '#526477',
+  gif: '#526477',
+  avif: '#526477',
+  tif: '#526477',
+  tiff: '#526477',
 };
+export const officeExtensions = ['doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx'];
+export const imageExtensions = [
+  'jpg',
+  'jpeg',
+  'png',
+  'webp',
+  'gif',
+  'avif',
+  'tif',
+  'tiff',
+];
+export const generalSubmissionExtensions = [
+  ...officeExtensions,
+  ...imageExtensions,
+];
 export const mimeTypes: Record<string, string> = {
   zip: 'application/zip',
   doc: 'application/msword',
@@ -61,5 +84,13 @@ export const mimeTypes: Record<string, string> = {
   xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
   ppt: 'application/vnd.ms-powerpoint',
   pptx: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+  jpg: 'image/jpeg',
+  jpeg: 'image/jpeg',
+  png: 'image/png',
+  webp: 'image/webp',
+  gif: 'image/gif',
+  avif: 'image/avif',
+  tif: 'image/tiff',
+  tiff: 'image/tiff',
 };
 export const initialFilters = { page: 1, limit: 10 };
