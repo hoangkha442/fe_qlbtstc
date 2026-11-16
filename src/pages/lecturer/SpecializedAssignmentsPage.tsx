@@ -128,8 +128,8 @@ export function SpecializedAssignmentsPanel({
       allowResubmit: a?.allowResubmit ?? true,
       allowLate: a?.allowLate ?? false,
       manuallyClosed: a?.manuallyClosed ?? false,
-      allowedExtensions: a?.allowedExtensions ?? ['zip'],
-      maxFiles: a?.maxFiles ?? 1,
+      allowedExtensions: a?.allowedExtensions ?? [],
+      maxFiles: a?.maxFiles ?? 10,
       maxFileBytes: a?.maxFileBytes ?? 10485760,
     });
     setError('');

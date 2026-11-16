@@ -49,7 +49,7 @@ Chọn Chuyên ngành và đăng nhập bằng tài khoản giảng viên cấp.
 3. Bộ lọc mặc định chọn **Tất cả lộ trình**, hiển thị các lộ trình được công bố. Có thể chọn một lộ trình cụ thể hoặc tìm theo tên. Bộ lọc lớp/học phần Đại cương cũng hiển thị giá trị **Tất cả** khi đang hiển thị toàn bộ.
 4. Khi chưa ghi danh, chỉ mở được các bài xem trước; tài liệu và bài thường vẫn khóa. Liên hệ giảng viên để được cấp quyền học đầy đủ.
 5. Sau khi ghi danh, xem video, nội dung Markdown, mã nguồn và tài liệu của các bài được công bố. Đánh dấu hoặc bỏ hoàn thành bài để cập nhật tiến độ lộ trình.
-6. Bài tập được nhóm theo lộ trình, chương và bài học. Trang nội dung bài học hiển thị bài tập liên quan; sidebar có liên kết tới bài tập chương. Nộp các định dạng/số file được giảng viên cho phép (tối đa 5 file, 10 MiB/file), xem lịch sử và tải từng phiên bản. Khi nhận ZIP có nút Chọn thư mục; thư mục được tự nén trong trình duyệt và loại `node_modules`/`.git`. Thời hạn và quyền nộp lại do giảng viên đặt.
+6. Bài tập được nhóm theo lộ trình, chương và bài học. Trang nội dung bài học hiển thị bài tập liên quan; sidebar có liên kết tới bài tập chương. Nộp các định dạng/số file được giảng viên cho phép (tối đa 10 file, 10 MiB/file), xem lịch sử và tải từng phiên bản. Khi nhận ZIP có nút Chọn thư mục; thư mục được tự nén trong trình duyệt và loại `node_modules`/`.git`. Thời hạn và quyền nộp lại do giảng viên đặt.
 
 Video hỗ trợ nhúng YouTube/Vimeo, phát liên kết MP4/WebM/OGG hoặc mở trên nền tảng ngoài. Tài liệu là các liên kết HTTPS do giảng viên quản lý. Markdown hiển thị qua [react-markdown](https://github.com/remarkjs/react-markdown), không thực thi HTML nhúng.
 
@@ -61,7 +61,7 @@ Menu tài khoản có đổi mật khẩu và đăng xuất. Đăng xuất gọi
 
 Phần **Đại cương** giữ các màn tổng quan, học kỳ, môn học, lớp, học phần, bài tập, bài nộp, tải file và xuất ZIP/Excel. Chi tiết bài nộp và từng phiên bản hiển thị email sinh viên.
 
-Trong Tạo/Sửa bài tập → Hình thức và định dạng nộp bài, chọn nhiều loại từ nhóm Tài liệu, Hình ảnh, ZIP/Thư mục, File nén khác và Mã nguồn. Có nút chọn/bỏ nhanh cả nhóm; nhập phần mở rộng khác rồi Enter hoặc phân cách bằng dấu phẩy. Dùng được cho Đại cương, Chuyên ngành và bài tập lồng trong chương/bài học. Phần mở rộng được chuẩn hóa, hỗ trợ `tar.gz`; đặt được số file và dung lượng cho từng bài. Bài cũ giữ cấu hình cũ cho đến khi được sửa và lưu.
+Trong Tạo/Sửa bài tập → Hình thức và định dạng nộp bài, các nhóm Tài liệu, Hình ảnh, ZIP/Thư mục, File nén khác và Mã nguồn được thu gọn. Tick từng định dạng hoặc checkbox Cả nhóm, xem danh sách được nhận và dùng Bỏ chọn tất cả khi cần. Ô Định dạng khác cho phép nhập đuôi rồi bấm Thêm hoặc Enter. Tạo mới luôn bắt đầu không chọn định dạng nào và không được lưu khi chưa chọn; áp dụng cho cả Đại cương, Chuyên ngành và bài tạo trong chương/bài học. Số file mới mặc định 10, có thể chọn từ 1 đến 10; vẫn tối đa 10 MiB/file. Khi sửa, bài cũ giữ cấu hình đã lưu, kể cả giới hạn 1 hoặc 5 file cho đến khi giảng viên đổi và lưu.
 
 Khi bài nhận ZIP, sinh viên có thể chọn nguyên thư mục. Client nén bằng fflate với worker, giữ cấu trúc và tự bỏ `node_modules`/`.git`; một thư mục tương đương một file ZIP. Giới hạn trước nén: 5.000 file, 20 MiB/file, tổng 100 MiB; ZIP sau nén phải nằm trong dung lượng giảng viên cho phép. Có trạng thái đang nén, khóa thao tác gửi trong lúc chuẩn bị và thông báo lỗi/kết quả. Có thể chọn cùng lúc ZIP thư mục và PDF/tài liệu khác nếu bài cho phép nhiều file. Lịch sử, nộp lại và điểm hoạt động theo cùng luồng hiện tại.
 

@@ -72,10 +72,6 @@ export const imageExtensions = [
   'tif',
   'tiff',
 ];
-export const generalSubmissionExtensions = [
-  ...officeExtensions,
-  ...imageExtensions,
-];
 export const submissionExtensionPattern =
   /^[a-z0-9][a-z0-9_-]{0,15}(?:\.[a-z0-9][a-z0-9_-]{0,15}){0,2}$/;
 export const normalizeExtension = (value: string) =>

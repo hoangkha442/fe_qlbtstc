@@ -1,4 +1,5 @@
-import { Button, Form, InputNumber, Select } from 'antd';
+import { useState } from 'react';
+import { Button, Checkbox, Collapse, Form, Input, InputNumber } from 'antd';
 import {
   imageExtensions,
   normalizeExtension,
@@ -45,56 +46,165 @@ function FileFormatSelect({
   id?: string;
   disabled?: boolean;
 }) {
+  const [custom, setCustom] = useState('');
+  const [customError, setCustomError] = useState('');
   const update = (values: string[]) =>
     onChange?.([...new Set(values.map(normalizeExtension).filter(Boolean))]);
+  const known = new Set(groups.flatMap((group) => group.extensions));
+  function addCustom() {
+    const extensions = custom
+      .split(/[,;\s]+/)
+      .map(normalizeExtension)
+      .filter(Boolean);
+    if (!extensions.length) return;
+    if (
+      extensions.some(
+        (extension) => !submissionExtensionPattern.test(extension),
+      )
+    ) {
+      setCustomError('Nhập phần mở rộng như pdf, zip hoặc tar.gz.');
+      return;
+    }
+    update([...value, ...extensions]);
+    setCustom('');
+    setCustomError('');
+  }
   return (
-    <div>
-      <Select
-        id={id}
-        className="w-full"
-        mode="tags"
-        value={value}
-        disabled={disabled}
-        onChange={update}
-        placeholder="Chọn định dạng hoặc nhập phần mở rộng rồi Enter"
-        tokenSeparators={[',', ';', ' ']}
-        maxTagCount="responsive"
-        options={groups.map((group) => ({
-          label: group.label,
-          options: group.extensions.map((extension) => ({
-            value: extension,
-            label: extension === 'zip' ? '.zip / Thư mục' : `.${extension}`,
-          })),
-        }))}
-      />
-      <div
-        className="mt-3 flex flex-wrap gap-2"
-        aria-label="Chọn nhanh nhóm định dạng"
-      >
-        {groups.map((group) => {
-          const selected = group.extensions.every((extension) =>
+    <div id={id} role="group" aria-label="Các định dạng được nhận">
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <span className="font-medium">
+          {value.length
+            ? `Đã chọn ${value.length} định dạng`
+            : 'Chưa chọn định dạng'}
+        </span>
+        {value.length > 0 && (
+          <Button
+            size="small"
+            type="link"
+            disabled={disabled}
+            onClick={() => update([])}
+          >
+            Bỏ chọn tất cả
+          </Button>
+        )}
+      </div>
+      <Collapse
+        accordion
+        defaultActiveKey="Tài liệu"
+        items={groups.map((group) => {
+          const count = group.extensions.filter((extension) =>
             value.includes(extension),
-          );
-          return (
-            <Button
-              key={group.label}
-              size="small"
-              type={selected ? 'primary' : 'default'}
-              disabled={disabled}
-              onClick={() =>
-                update(
-                  selected
-                    ? value.filter(
-                        (extension) => !group.extensions.includes(extension),
-                      )
-                    : [...value, ...group.extensions],
-                )
-              }
-            >
-              {group.label}
-            </Button>
-          );
+          ).length;
+          const all = count === group.extensions.length;
+          return {
+            key: group.label,
+            label: (
+              <span className="font-medium">
+                {group.label}
+                {count > 0 && (
+                  <span className="ml-2 text-sm text-muted">
+                    {count} đã chọn
+                  </span>
+                )}
+              </span>
+            ),
+            extra: (
+              <span
+                onClick={(event) => event.stopPropagation()}
+                onKeyDown={(event) => event.stopPropagation()}
+              >
+                <Checkbox
+                  checked={all}
+                  indeterminate={count > 0 && !all}
+                  disabled={disabled}
+                  onChange={() =>
+                    update(
+                      all
+                        ? value.filter(
+                            (extension) =>
+                              !group.extensions.includes(extension),
+                          )
+                        : [...value, ...group.extensions],
+                    )
+                  }
+                >
+                  Cả nhóm
+                </Checkbox>
+              </span>
+            ),
+            children: (
+              <Checkbox.Group
+                className="grid grid-cols-2 gap-x-4 gap-y-3 sm:grid-cols-3"
+                value={value.filter((extension) =>
+                  group.extensions.includes(extension),
+                )}
+                disabled={disabled}
+                options={group.extensions.map((extension) => ({
+                  label: `.${extension}`,
+                  value: extension,
+                }))}
+                onChange={(selected) =>
+                  update([
+                    ...value.filter(
+                      (extension) => !group.extensions.includes(extension),
+                    ),
+                    ...selected.map(String),
+                  ])
+                }
+              />
+            ),
+          };
         })}
+      />
+      {value.length > 0 && (
+        <p className="mt-3 mb-0 break-words text-sm">
+          Được nộp: {value.map((extension) => `.${extension}`).join(', ')}
+        </p>
+      )}
+      <div className="mt-5">
+        <label className="mb-2 block font-medium" htmlFor={`${id}-custom`}>
+          Định dạng khác
+        </label>
+        <div className="flex gap-2">
+          <Input
+            id={`${id}-custom`}
+            value={custom}
+            disabled={disabled}
+            placeholder="Ví dụ: .csv, .rar, .tar.gz"
+            onChange={(event) => {
+              setCustom(event.target.value);
+              setCustomError('');
+            }}
+            onPressEnter={(event) => {
+              event.preventDefault();
+              addCustom();
+            }}
+          />
+          <Button disabled={disabled} onClick={addCustom}>
+            Thêm
+          </Button>
+        </div>
+        {customError && (
+          <p className="mt-2 text-red-600" role="alert">
+            {customError}
+          </p>
+        )}
+        <div className="mt-2 flex flex-wrap gap-1">
+          {value
+            .filter((extension) => !known.has(extension))
+            .map((extension) => (
+              <Checkbox
+                key={extension}
+                checked
+                disabled={disabled}
+                onChange={() =>
+                  update(value.filter((item) => item !== extension))
+                }
+              >
+                .{extension}
+              </Checkbox>
+            ))}
+        </div>
       </div>
     </div>
   );
@@ -137,7 +247,7 @@ export default function AssignmentFileRules({
       <Form.Item
         name={field('allowedExtensions')}
         label="Các định dạng được nhận"
-        extra="Có thể chọn nhiều loại hoặc nhập thêm: .pdf, .zip, .csv... Chọn ZIP để nhận cả thư mục được tự nén."
+        extra="Chọn từng định dạng hoặc cả nhóm. ZIP nhận cả thư mục được tự nén."
         rules={[
           {
             required: true,
@@ -172,12 +282,12 @@ export default function AssignmentFileRules({
               required: true,
               type: 'integer',
               min: 1,
-              max: 5,
-              message: 'Chọn từ 1 đến 5 file.',
+              max: 10,
+              message: 'Chọn từ 1 đến 10 file.',
             },
           ]}
         >
-          <InputNumber className="w-full" min={1} max={5} />
+          <InputNumber className="w-full" min={1} max={10} />
         </Form.Item>
         <Form.Item
           name={field('maxFileBytes')}

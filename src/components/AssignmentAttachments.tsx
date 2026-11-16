@@ -113,8 +113,8 @@ export default function AssignmentAttachments({
                   allowResubmit: true,
                   allowLate: false,
                   manuallyClosed: false,
-                  allowedExtensions: ['zip'],
-                  maxFiles: 1,
+                  allowedExtensions: [],
+                  maxFiles: 10,
                   maxFileBytes: 10485760,
                 })
               }
