@@ -1,5 +1,6 @@
 import { DatePicker, Form, Input, Switch } from 'antd';
 import RichTextEditor from './RichTextEditor';
+import AssignmentFileRules from './AssignmentFileRules';
 
 export default function AssignmentContentFields({
   prefix = [],
@@ -79,6 +80,7 @@ export default function AssignmentContentFields({
           <Switch />
         </Form.Item>
       </div>
+      <AssignmentFileRules prefix={prefix} />
     </>
   );
 }

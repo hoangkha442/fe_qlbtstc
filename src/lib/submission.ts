@@ -8,6 +8,10 @@ export function submissionBody(fields: StudentFields, files: File[]) {
   body.append('email', fields.email);
   if (fields.note) body.append('note', fields.note);
   if (fields.secret) body.append('secret', fields.secret);
+  appendSubmissionFiles(body, files);
+  return body;
+}
+export function appendSubmissionFiles(body: FormData, files: File[]) {
   for (const file of files)
     body.append(
       'files',
@@ -18,7 +22,6 @@ export function submissionBody(fields: StudentFields, files: File[]) {
           }),
       file.name,
     );
-  return body;
 }
 
 interface SavedAttempt {

@@ -40,6 +40,8 @@ import {
 import ReceiptView from '../components/ReceiptView';
 import { LearningText } from '../components/LearningContent';
 import { useResubmission } from '../lib/resubmission-context';
+import FolderUploadButton from '../components/FolderUploadButton';
+import { submissionFileExtension } from '../lib/utils';
 
 interface Attempt {
   fields: StudentFields;
@@ -70,6 +72,7 @@ export default function AssignmentPage() {
   const [confirm, setConfirm] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [preparingFolder, setPreparingFolder] = useState(false);
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState('');
   const [retryAt, setRetryAt] = useState(0);
@@ -113,6 +116,7 @@ export default function AssignmentPage() {
     clearResubmissionDraft();
   }, [a, id, resubmissionDraft, form, clearResubmissionDraft]);
   function review(values: StudentFields) {
+    if (preparingFolder) return;
     if (!rawFiles.length) {
       void message.warning('Vui lòng chọn ít nhất một file để nộp.');
       return;
@@ -533,11 +537,18 @@ export default function AssignmentPage() {
                       listType="picture"
                       accept={a.allowedExtensions.map((e) => `.${e}`).join(',')}
                       fileList={files}
-                      disabled={!status.accepting || busy || !!attempt}
+                      disabled={
+                        !status.accepting ||
+                        busy ||
+                        preparingFolder ||
+                        !!attempt
+                      }
                       beforeUpload={(file, batch) => {
-                        const extension =
-                          file.name.split('.').pop()?.toLowerCase() ?? '';
-                        if (!a.allowedExtensions.includes(extension)) {
+                        const extension = submissionFileExtension(
+                          file.name,
+                          a.allowedExtensions,
+                        );
+                        if (!extension) {
                           void message.error(
                             `${file.name}: định dạng không được chấp nhận.`,
                           );
@@ -570,6 +581,24 @@ export default function AssignmentPage() {
                         Tối đa {formatBytes(a.maxFileBytes)}/file
                       </p>
                     </Upload.Dragger>
+                    {a.allowedExtensions.includes('zip') && (
+                      <FolderUploadButton
+                        disabled={
+                          !status.accepting ||
+                          busy ||
+                          !!attempt ||
+                          (a.maxFiles > 1 && files.length >= a.maxFiles) ||
+                          (resubmit && !a.allowResubmit)
+                        }
+                        maxFileBytes={a.maxFileBytes}
+                        onBusyChange={setPreparingFolder}
+                        onFile={(file) =>
+                          setFiles((current) =>
+                            a.maxFiles === 1 ? [file] : [...current, file],
+                          )
+                        }
+                      />
+                    )}
                     <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
                       <span className="text-xs text-muted">
                         <SafetyCertificateOutlined /> File chỉ giảng viên phụ
@@ -579,6 +608,7 @@ export default function AssignmentPage() {
                         size="large"
                         type="primary"
                         htmlType="submit"
+                        disabled={preparingFolder}
                         icon={<ArrowRightOutlined />}
                         iconPlacement="end"
                       >

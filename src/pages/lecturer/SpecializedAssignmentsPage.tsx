@@ -128,6 +128,9 @@ export function SpecializedAssignmentsPanel({
       allowResubmit: a?.allowResubmit ?? true,
       allowLate: a?.allowLate ?? false,
       manuallyClosed: a?.manuallyClosed ?? false,
+      allowedExtensions: a?.allowedExtensions ?? ['zip'],
+      maxFiles: a?.maxFiles ?? 1,
+      maxFileBytes: a?.maxFileBytes ?? 10485760,
     });
     setError('');
     setEditor({ assignment: a });
@@ -216,7 +219,7 @@ export function SpecializedAssignmentsPanel({
       : 'Bài tập mã nguồn';
   const action = (
     <Button type="primary" icon={<PlusOutlined />} onClick={() => open()}>
-      Tạo bài tập ZIP
+      Tạo bài tập
     </Button>
   );
   const modules =
@@ -271,7 +274,7 @@ export function SpecializedAssignmentsPanel({
               }}
             />
           </Space>
-          <Tag color="blue">1 ZIP · Tối đa 10 MB</Tag>
+          <Tag color="blue">Định dạng tùy chỉnh theo bài tập</Tag>
         </div>
         <QueryState
           pending={list.isPending}
@@ -495,7 +498,7 @@ export function SpecializedAssignmentsPanel({
           <Alert
             showIcon
             type="info"
-            title="Nộp ZIP mã nguồn"
+            title="Nộp bài theo quy định đã chọn"
             description="Chỉ sinh viên được ghi danh mới có thể nộp bài. Chương/bài học liên quan phải được công bố."
           />
           {error && (

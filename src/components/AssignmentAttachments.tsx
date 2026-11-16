@@ -27,8 +27,8 @@ export default function AssignmentAttachments({
     <section className="assignment-attachments">
       <h3>Bài tập mã nguồn</h3>
       <p className="mb-4 text-muted">
-        Thêm bài tập mới hoặc liên kết bài tập trong cùng lộ trình. Mỗi lần nộp
-        nhận một file ZIP tối đa 10 MB.
+        Thêm bài tập mới hoặc liên kết bài tập trong cùng lộ trình. Tùy chọn
+        định dạng và số file nhận cho từng bài.
       </p>
       {!!existing.length && (
         <div
@@ -113,6 +113,9 @@ export default function AssignmentAttachments({
                   allowResubmit: true,
                   allowLate: false,
                   manuallyClosed: false,
+                  allowedExtensions: ['zip'],
+                  maxFiles: 1,
+                  maxFileBytes: 10485760,
                 })
               }
             >

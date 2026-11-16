@@ -1,18 +1,17 @@
 import AllSelect from '../../components/AllSelect';
 import RichTextEditor from '../../components/RichTextEditor';
+import AssignmentFileRules from '../../components/AssignmentFileRules';
 import { useEffect, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   App,
   Alert,
   Button,
-  Checkbox,
   DatePicker,
   Drawer,
   Dropdown,
   Form,
   Input,
-  InputNumber,
   Popconfirm,
   Select,
   Switch,
@@ -37,8 +36,6 @@ import {
   dayjs,
   formatBytes,
   generalSubmissionExtensions,
-  imageExtensions,
-  officeExtensions,
   refName,
   statusOf,
   TIMEZONE,
@@ -404,7 +401,7 @@ interface EditorFields {
   allowResubmit: boolean;
   allowedExtensions: string[];
   maxFiles: number;
-  maxFileMB: number;
+  maxFileBytes: number;
 }
 function AssignmentEditor({
   id,
@@ -433,19 +430,16 @@ function AssignmentEditor({
         ...a,
         opensAt: dayjs(a.opensAt).tz(TIMEZONE),
         dueAt: dayjs(a.dueAt).tz(TIMEZONE),
-        maxFileMB: a.maxFileBytes / 1024 / 1024,
       });
     }
   }, [detail.data, form]);
   async function save(values: EditorFields) {
     setBusy(true);
     setError('');
-    const { maxFileMB, ...rest } = values;
     const payload = {
-      ...rest,
+      ...values,
       opensAt: `${values.opensAt.format('YYYY-MM-DDTHH:mm:ss')}+07:00`,
       dueAt: `${values.dueAt.format('YYYY-MM-DDTHH:mm:ss')}+07:00`,
-      maxFileBytes: Math.floor(maxFileMB * 1024 * 1024),
     };
     try {
       if (id) await api.patch(`/lecturer/assignments/${id}`, payload);
@@ -513,7 +507,7 @@ function AssignmentEditor({
             allowResubmit: false,
             allowedExtensions: generalSubmissionExtensions,
             maxFiles: 5,
-            maxFileMB: 10,
+            maxFileBytes: 10485760,
             opensAt: dayjs().tz(TIMEZONE),
             dueAt: dayjs().tz(TIMEZONE).add(7, 'day'),
           }}
@@ -643,80 +637,7 @@ function AssignmentEditor({
               </div>
             ))}
           </div>
-          <h3 className="mt-7 mb-5">Quy định file</h3>
-          <Form.Item
-            label="Định dạng được chấp nhận"
-            name="allowedExtensions"
-            extra="Sinh viên chỉ được nộp các định dạng bạn chọn bên dưới."
-            rules={[
-              {
-                required: true,
-                type: 'array',
-                min: 1,
-                message: 'Chọn ít nhất một định dạng.',
-              },
-            ]}
-          >
-            <Checkbox.Group className="flex flex-col gap-4">
-              <div>
-                <div className="mb-2 font-medium">Tài liệu Office</div>
-                <div className="flex flex-wrap gap-x-4 gap-y-2">
-                  {officeExtensions.map((extension) => (
-                    <Checkbox key={extension} value={extension}>
-                      .{extension}
-                    </Checkbox>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <div className="mb-2 font-medium">Hình ảnh</div>
-                <div className="flex flex-wrap gap-x-4 gap-y-2">
-                  {imageExtensions.map((extension) => (
-                    <Checkbox key={extension} value={extension}>
-                      .{extension}
-                    </Checkbox>
-                  ))}
-                </div>
-              </div>
-            </Checkbox.Group>
-          </Form.Item>
-          <div className="grid grid-cols-2 gap-5">
-            <Form.Item
-              label="Số file tối đa"
-              name="maxFiles"
-              rules={[
-                {
-                  required: true,
-                  type: 'integer',
-                  min: 1,
-                  max: 5,
-                  message: 'Chọn từ 1 đến 5 file.',
-                },
-              ]}
-            >
-              <InputNumber className="w-full" min={1} max={5} />
-            </Form.Item>
-            <Form.Item
-              label="Dung lượng mỗi file (MB)"
-              name="maxFileMB"
-              rules={[
-                {
-                  required: true,
-                  type: 'number',
-                  min: 0.001,
-                  max: 10,
-                  message: 'Dung lượng từ 0,001 đến 10 MB.',
-                },
-              ]}
-            >
-              <InputNumber
-                className="w-full"
-                min={0.001}
-                max={10}
-                precision={3}
-              />
-            </Form.Item>
-          </div>
+          <AssignmentFileRules />
           {error && <Alert type="error" showIcon title={error} />}
         </Form>
       </QueryState>

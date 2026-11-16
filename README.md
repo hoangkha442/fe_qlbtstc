@@ -49,7 +49,7 @@ Chọn Chuyên ngành và đăng nhập bằng tài khoản giảng viên cấp.
 3. Bộ lọc mặc định chọn **Tất cả lộ trình**, hiển thị các lộ trình được công bố. Có thể chọn một lộ trình cụ thể hoặc tìm theo tên. Bộ lọc lớp/học phần Đại cương cũng hiển thị giá trị **Tất cả** khi đang hiển thị toàn bộ.
 4. Khi chưa ghi danh, chỉ mở được các bài xem trước; tài liệu và bài thường vẫn khóa. Liên hệ giảng viên để được cấp quyền học đầy đủ.
 5. Sau khi ghi danh, xem video, nội dung Markdown, mã nguồn và tài liệu của các bài được công bố. Đánh dấu hoặc bỏ hoàn thành bài để cập nhật tiến độ lộ trình.
-6. Bài tập được nhóm theo lộ trình, chương và bài học. Trang nội dung bài học hiển thị bài tập liên quan; sidebar có liên kết tới bài tập chương. Nộp một file ZIP mã nguồn tối đa 10 MiB, xem lịch sử và tải từng phiên bản. Bỏ `node_modules`, `.git` trước khi nén; ZIP phải chứa mã nguồn thật. Thời hạn và quyền nộp lại do giảng viên đặt.
+6. Bài tập được nhóm theo lộ trình, chương và bài học. Trang nội dung bài học hiển thị bài tập liên quan; sidebar có liên kết tới bài tập chương. Nộp các định dạng/số file được giảng viên cho phép (tối đa 5 file, 10 MiB/file), xem lịch sử và tải từng phiên bản. Khi nhận ZIP có nút Chọn thư mục; thư mục được tự nén trong trình duyệt và loại `node_modules`/`.git`. Thời hạn và quyền nộp lại do giảng viên đặt.
 
 Video hỗ trợ nhúng YouTube/Vimeo, phát liên kết MP4/WebM/OGG hoặc mở trên nền tảng ngoài. Tài liệu là các liên kết HTTPS do giảng viên quản lý. Markdown hiển thị qua [react-markdown](https://github.com/remarkjs/react-markdown), không thực thi HTML nhúng.
 
@@ -61,7 +61,9 @@ Menu tài khoản có đổi mật khẩu và đăng xuất. Đăng xuất gọi
 
 Phần **Đại cương** giữ các màn tổng quan, học kỳ, môn học, lớp, học phần, bài tập, bài nộp, tải file và xuất ZIP/Excel. Chi tiết bài nộp và từng phiên bản hiển thị email sinh viên.
 
-Trong Tạo/Sửa bài tập → Quy định file, các định dạng được chia thành **Tài liệu Office** và **Hình ảnh**. Bài tập mới chọn sẵn cả hai nhóm; có thể bỏ các loại không nhận. Bài tập cũ giữ lựa chọn đã lưu, giảng viên cần bật thêm ảnh rồi lưu để sinh viên nộp được. Ảnh được lưu/tải theo cùng luồng bài nộp, biên nhận và lịch sử; không cần cấu hình môi trường mới.
+Trong Tạo/Sửa bài tập → Hình thức và định dạng nộp bài, chọn nhiều loại từ nhóm Tài liệu, Hình ảnh, ZIP/Thư mục, File nén khác và Mã nguồn. Có nút chọn/bỏ nhanh cả nhóm; nhập phần mở rộng khác rồi Enter hoặc phân cách bằng dấu phẩy. Dùng được cho Đại cương, Chuyên ngành và bài tập lồng trong chương/bài học. Phần mở rộng được chuẩn hóa, hỗ trợ `tar.gz`; đặt được số file và dung lượng cho từng bài. Bài cũ giữ cấu hình cũ cho đến khi được sửa và lưu.
+
+Khi bài nhận ZIP, sinh viên có thể chọn nguyên thư mục. Client nén bằng fflate với worker, giữ cấu trúc và tự bỏ `node_modules`/`.git`; một thư mục tương đương một file ZIP. Giới hạn trước nén: 5.000 file, 20 MiB/file, tổng 100 MiB; ZIP sau nén phải nằm trong dung lượng giảng viên cho phép. Có trạng thái đang nén, khóa thao tác gửi trong lúc chuẩn bị và thông báo lỗi/kết quả. Có thể chọn cùng lúc ZIP thư mục và PDF/tài liệu khác nếu bài cho phép nhiều file. Lịch sử, nộp lại và điểm hoạt động theo cùng luồng hiện tại.
 
 Phần **Chuyên ngành** có:
 
@@ -115,7 +117,7 @@ Các màn có trạng thái tải, lỗi kèm thử lại, danh sách rỗng, x�
 
 Đại cương: bấm Nộp lại bài ngay trên biên nhận sau khi nộp, hoặc tra cứu bằng mã biên nhận và mã bí mật rồi bấm Nộp lại bài. Form điền sẵn thông tin và mã bí mật, giữ nguyên MSSV; chọn lại toàn bộ file đúng rồi xác nhận. Mã bí mật được chuyển giữa hai trang trong bộ nhớ, không đặt vào URL, lịch sử điều hướng, localStorage hoặc sessionStorage. Nếu reload form, nhập lại mã bí mật hoặc tra cứu lại.
 
-Chuyên ngành: mở bài tập → Bài đã nộp & điểm → Nộp lại bài, chọn ZIP đúng và xác nhận hộp thoại trước khi gửi; không cần mã bí mật. Có thể hủy hộp thoại để kiểm tra file, chưa phát sinh yêu cầu nộp bài.
+Chuyên ngành: mở bài tập → Bài đã nộp & điểm → Nộp lại bài, chọn các file/thư mục đúng theo quy định rồi xác nhận hộp thoại trước khi gửi; không cần mã bí mật. Có thể hủy hộp thoại để kiểm tra file, chưa phát sinh yêu cầu nộp bài.
 
 Cả hai luồng chỉ nộp lại khi giảng viên đã bật Cho nộp lại và bài còn nhận bài. Khi không được phép, giao diện khóa nút và nêu lý do. Nộp lại tạo phiên bản mới chưa chấm, giữ bản/điểm cũ trong lịch sử; thử lại yêu cầu lỗi vẫn dùng cùng key và nội dung để tránh tạo trùng phiên bản.
 

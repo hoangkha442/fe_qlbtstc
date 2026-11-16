@@ -39,12 +39,15 @@ import {
   ImportantNotice,
 } from '../../components/common';
 import { LearningText } from '../../components/LearningContent';
+import FolderUploadButton from '../../components/FolderUploadButton';
+import { submissionFileExtension } from '../../lib/utils';
+import { appendSubmissionFiles } from '../../lib/submission';
 
 type Attempt = {
   key: string;
   storageKey: string;
   fields: StudentFields;
-  file: File;
+  files: File[];
 };
 export default function SourceAssignmentPage() {
   const { id = '' } = useParams();
@@ -55,6 +58,7 @@ export default function SourceAssignmentPage() {
   const [files, setFiles] = useState<UploadFile[]>([]);
   const [attempt, setAttempt] = useState<Attempt>();
   const [busy, setBusy] = useState(false);
+  const [preparingFolder, setPreparingFolder] = useState(false);
   const [error, setError] = useState('');
   const [downloading, setDownloading] = useState('');
   const [retryAt, setRetryAt] = useState(0);
@@ -106,7 +110,7 @@ export default function SourceAssignmentPage() {
   const blocked = !status?.accepting || (!!mine.data && !a?.allowResubmit);
   const cannotSend = blocked && !attempt;
   function review(values: { note?: string }) {
-    if (busy || sending.current || wait > 0) return;
+    if (busy || preparingFolder || sending.current || wait > 0) return;
     if (!attempt && blocked) {
       notification.warning({
         title: 'Hiện chưa thể nộp lại',
@@ -116,9 +120,11 @@ export default function SourceAssignmentPage() {
       });
       return;
     }
-    const file = (files[0]?.originFileObj ?? files[0]) as File | undefined;
-    if (!attempt && !file) {
-      notification.warning({ title: 'Vui lòng chọn file ZIP mã nguồn' });
+    const selectedFiles = files.map(
+      (file) => (file.originFileObj ?? file) as File,
+    );
+    if (!attempt && !selectedFiles.length) {
+      notification.warning({ title: 'Vui lòng chọn file hoặc thư mục để nộp' });
       return;
     }
     if (mine.data && !attempt) {
@@ -126,7 +132,11 @@ export default function SourceAssignmentPage() {
         title: `Xác nhận nộp lại bài · phiên bản ${mine.data.latestVersion + 1}`,
         content: (
           <div>
-            <p className="break-words font-medium">{file?.name}</p>
+            {selectedFiles.map((file) => (
+              <p key={file.name} className="break-words font-medium">
+                {file.name}
+              </p>
+            ))}
             <p>
               Phiên bản mới thay thế bài hiện tại để chấm. Bản cũ và điểm cũ vẫn
               được giữ trong lịch sử.
@@ -140,10 +150,13 @@ export default function SourceAssignmentPage() {
     } else void submit(values);
   }
   async function submit(values: { note?: string }) {
-    if (!student || !a || sending.current || wait > 0) return;
-    const file = (files[0]?.originFileObj ?? files[0]) as File | undefined;
-    if (!attempt && !file) {
-      notification.warning({ title: 'Vui lòng chọn file ZIP mã nguồn' });
+    if (!student || !a || preparingFolder || sending.current || wait > 0)
+      return;
+    const selectedFiles = files.map(
+      (file) => (file.originFileObj ?? file) as File,
+    );
+    if (!attempt && !selectedFiles.length) {
+      notification.warning({ title: 'Vui lòng chọn file hoặc thư mục để nộp' });
       return;
     }
     sending.current = true;
@@ -159,15 +172,15 @@ export default function SourceAssignmentPage() {
           note: values.note?.trim() ?? '',
         };
         active = {
-          ...(await submissionKey(id, fields, [file!])),
+          ...(await submissionKey(id, fields, selectedFiles)),
           fields,
-          file: file!,
+          files: selectedFiles,
         };
         setAttempt(active);
       }
       const body = new FormData();
       if (active.fields.note) body.append('note', active.fields.note);
-      body.append('files', active.file, active.file.name);
+      appendSubmissionFiles(body, active.files);
       const { data } = await api.post<Receipt>(
         `/student/assignments/${id}/submissions`,
         body,
@@ -263,12 +276,12 @@ export default function SourceAssignmentPage() {
                 </section>
                 <section className="surface p-6" ref={uploadSection}>
                   <h2 className="mb-5">
-                    {mine.data ? 'Nộp lại mã nguồn' : 'Nộp mã nguồn'}
+                    {mine.data ? 'Nộp lại bài tập' : 'Nộp bài tập'}
                   </h2>
                   {mine.data && a.allowResubmit && (
                     <p className="mb-5 text-muted">
-                      Chọn file ZIP đúng để nộp phiên bản mới. Bài và điểm cũ
-                      được giữ trong lịch sử.
+                      Chọn file hoặc thư mục đúng để nộp phiên bản mới. Bài và
+                      điểm cũ được giữ trong lịch sử.
                     </p>
                   )}
                   {!a.allowResubmit && (
@@ -301,7 +314,7 @@ export default function SourceAssignmentPage() {
                       {
                         key: 'format',
                         label: 'Định dạng',
-                        children: 'Một file ZIP, tối đa 10 MB',
+                        children: `${a.allowedExtensions.map((extension) => `.${extension}`).join(', ')} · Tối đa ${a.maxFiles} file, ${formatBytes(a.maxFileBytes)}/file`,
                       },
                     ]}
                   />
@@ -333,19 +346,34 @@ export default function SourceAssignmentPage() {
                     requiredMark={false}
                   >
                     <Upload.Dragger
-                      accept=".zip,application/zip,application/x-zip-compressed"
-                      maxCount={1}
+                      accept={a.allowedExtensions
+                        .map((extension) => `.${extension}`)
+                        .join(',')}
+                      multiple={a.maxFiles > 1}
+                      maxCount={a.maxFiles}
                       fileList={files}
-                      disabled={busy || blocked || !!attempt}
-                      beforeUpload={(file) => {
+                      disabled={busy || preparingFolder || blocked || !!attempt}
+                      beforeUpload={(file, batch) => {
                         if (
-                          !file.name.toLowerCase().endsWith('.zip') ||
+                          !submissionFileExtension(
+                            file.name,
+                            a.allowedExtensions,
+                          ) ||
                           file.size < 1 ||
                           file.size > a.maxFileBytes
                         ) {
                           notification.error({
                             title: 'File không hợp lệ',
-                            description: `Chọn ZIP từ 1 byte đến ${formatBytes(a.maxFileBytes)}.`,
+                            description: `Chọn ${a.allowedExtensions.map((extension) => `.${extension}`).join(', ')} từ 1 byte đến ${formatBytes(a.maxFileBytes)}.`,
+                          });
+                          return Upload.LIST_IGNORE;
+                        }
+                        if (
+                          a.maxFiles > 1 &&
+                          files.length + batch.length > a.maxFiles
+                        ) {
+                          notification.warning({
+                            title: `Chỉ được chọn tối đa ${a.maxFiles} file`,
                           });
                           return Upload.LIST_IGNORE;
                         }
@@ -356,11 +384,31 @@ export default function SourceAssignmentPage() {
                       <p className="ant-upload-drag-icon">
                         <CloudUploadOutlined />
                       </p>
-                      <p>Chọn hoặc kéo file ZIP mã nguồn vào đây</p>
+                      <p>Chọn hoặc kéo file bài nộp vào đây</p>
                       <p className="ant-upload-hint">
-                        Bỏ node_modules và .git trước khi nén.
+                        {a.allowedExtensions
+                          .map((extension) => `.${extension}`)
+                          .join(', ')}{' '}
+                        · Tối đa {formatBytes(a.maxFileBytes)}/file
                       </p>
                     </Upload.Dragger>
+                    {a.allowedExtensions.includes('zip') && (
+                      <FolderUploadButton
+                        disabled={
+                          busy ||
+                          blocked ||
+                          !!attempt ||
+                          (a.maxFiles > 1 && files.length >= a.maxFiles)
+                        }
+                        maxFileBytes={a.maxFileBytes}
+                        onBusyChange={setPreparingFolder}
+                        onFile={(file) =>
+                          setFiles((current) =>
+                            a.maxFiles === 1 ? [file] : [...current, file],
+                          )
+                        }
+                      />
+                    )}
                     <Form.Item
                       className="mt-6"
                       name="note"
@@ -385,7 +433,7 @@ export default function SourceAssignmentPage() {
                       htmlType="submit"
                       size="large"
                       loading={busy}
-                      disabled={cannotSend || wait > 0}
+                      disabled={preparingFolder || cannotSend || wait > 0}
                     >
                       {wait
                         ? `Thử lại sau ${wait} giây`
@@ -413,7 +461,7 @@ export default function SourceAssignmentPage() {
                             block: 'start',
                           });
                           notification.info({
-                            title: 'Chọn file ZIP đúng để nộp lại',
+                            title: 'Chọn file hoặc thư mục đúng để nộp lại',
                           });
                         }}
                       >

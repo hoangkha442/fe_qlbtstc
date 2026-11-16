@@ -76,7 +76,30 @@ export const generalSubmissionExtensions = [
   ...officeExtensions,
   ...imageExtensions,
 ];
+export const submissionExtensionPattern =
+  /^[a-z0-9][a-z0-9_-]{0,15}(?:\.[a-z0-9][a-z0-9_-]{0,15}){0,2}$/;
+export const normalizeExtension = (value: string) =>
+  value.trim().toLowerCase().replace(/^\./, '');
+export function submissionFileExtension(filename: string, allowed: string[]) {
+  const name = filename.toLowerCase();
+  return (
+    [...allowed]
+      .sort((a, b) => b.length - a.length)
+      .find((extension) => name.endsWith(`.${extension}`)) ?? ''
+  );
+}
 export const mimeTypes: Record<string, string> = {
+  pdf: 'application/pdf',
+  txt: 'text/plain',
+  csv: 'text/csv',
+  json: 'application/json',
+  html: 'text/html',
+  css: 'text/css',
+  js: 'text/javascript',
+  rar: 'application/vnd.rar',
+  '7z': 'application/x-7z-compressed',
+  gz: 'application/gzip',
+  'tar.gz': 'application/gzip',
   zip: 'application/zip',
   doc: 'application/msword',
   docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',

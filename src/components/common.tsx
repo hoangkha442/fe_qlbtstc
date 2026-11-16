@@ -6,6 +6,9 @@ import {
   FilePptOutlined,
   FileWordOutlined,
   FileImageOutlined,
+  FileOutlined,
+  FilePdfOutlined,
+  FileTextOutlined,
   ReloadOutlined,
   ExclamationCircleFilled,
   ExclamationCircleOutlined,
@@ -159,16 +162,36 @@ export function FileIcon({
   format: string;
   small?: boolean;
 }) {
-  const Icon =
-    format === 'zip'
-      ? FileZipOutlined
-      : format.startsWith('xls')
-        ? FileExcelOutlined
-        : format.startsWith('ppt')
-          ? FilePptOutlined
-          : imageExtensions.includes(format)
-            ? FileImageOutlined
-            : FileWordOutlined;
+  const Icon = ['zip', 'rar', '7z', 'tar', 'gz', 'tar.gz'].includes(format)
+    ? FileZipOutlined
+    : format.startsWith('xls')
+      ? FileExcelOutlined
+      : format.startsWith('ppt')
+        ? FilePptOutlined
+        : imageExtensions.includes(format)
+          ? FileImageOutlined
+          : format === 'pdf'
+            ? FilePdfOutlined
+            : format.startsWith('doc')
+              ? FileWordOutlined
+              : [
+                    'txt',
+                    'csv',
+                    'md',
+                    'json',
+                    'html',
+                    'css',
+                    'js',
+                    'ts',
+                    'tsx',
+                    'jsx',
+                    'sql',
+                    'py',
+                    'java',
+                    'php',
+                  ].includes(format)
+                ? FileTextOutlined
+                : FileOutlined;
   return (
     <span
       className={small ? 'file-icon small' : 'file-icon'}

@@ -2,6 +2,9 @@ import type { Dayjs } from 'dayjs';
 import { TIMEZONE } from './utils';
 
 export interface AssignmentDraft {
+  allowedExtensions?: string[];
+  maxFiles?: number;
+  maxFileBytes?: number;
   title: string;
   instructions?: string;
   opensAt: Dayjs;
@@ -26,6 +29,13 @@ export function assignmentPayload(values: AssignmentDraft) {
     allowResubmit: values.allowResubmit ?? false,
     allowLate: values.allowLate ?? false,
     manuallyClosed: values.manuallyClosed ?? false,
+    ...(values.allowedExtensions
+      ? { allowedExtensions: values.allowedExtensions }
+      : {}),
+    ...(values.maxFiles != null ? { maxFiles: values.maxFiles } : {}),
+    ...(values.maxFileBytes != null
+      ? { maxFileBytes: values.maxFileBytes }
+      : {}),
   };
 }
 

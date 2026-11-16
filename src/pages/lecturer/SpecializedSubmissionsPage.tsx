@@ -90,7 +90,7 @@ export default function SpecializedSubmissionsPage() {
     <>
       <PageHeading
         title="Bài nộp mã nguồn"
-        description="Xem các phiên bản ZIP của sinh viên trong các lộ trình Chuyên ngành."
+        description="Xem file và lịch sử bài nộp của sinh viên trong các lộ trình Chuyên ngành."
         extra={
           <Space wrap>
             <Button
@@ -315,7 +315,7 @@ export default function SpecializedSubmissionsPage() {
                               )
                             }
                           >
-                            Tải ZIP
+                            Tải file
                           </Button>
                         )}
                       />
