@@ -127,6 +127,16 @@ Trong Bài nộp Đại cương hoặc Bài nộp mã nguồn, giảng viên m�
 
 Danh sách hiển thị điểm phiên bản mới nhất hoặc Chưa chấm. Đại cương tra cứu bằng mã biên nhận và mã bí mật để xem điểm/nhận xét từng phiên bản và lưu kết quả vào biên nhận. Sinh viên Chuyên ngành mở bài tập để xem phần Bài đã nộp & điểm; có nút Làm mới kết quả và tự kiểm tra lại khi quay lại cửa sổ. Phiên bản mới nộp lại không kế thừa điểm cũ. Kết quả hiển thị dù giảng viên không chọn gửi email.
 
+## Xem trước file bài nộp
+
+Nút **Xem trước** nằm cạnh file trong chi tiết bài nộp của giảng viên (Đại cương và Chuyên ngành), biên nhận/tra cứu bằng mã bí mật và phần Bài đã nộp & điểm của sinh viên Chuyên ngành. Có thể xem từng phiên bản, đóng cửa sổ để chấm điểm và tải file gốc khi cần.
+
+Hỗ trợ ảnh trình duyệt đọc được (JPG/JPEG, PNG, WebP, GIF, AVIF, BMP), PDF, nội dung Word DOCX, bảng tính XLSX với bộ chọn sheet, nội dung từng trang chiếu PPTX, văn bản/mã nguồn và danh sách file trong ZIP. Chọn file bên trong ZIP để xem nội dung; HTML, SVG và mã nguồn hiển thị dạng văn bản, không chạy mã. Video MP4/WebM và âm thanh MP3/WAV/OGG dùng trình phát của trình duyệt nếu định dạng mã hóa được hỗ trợ.
+
+Word/PowerPoint hiển thị nội dung để đọc, không bảo đảm bố cục, phông chữ, hiệu ứng hoặc công thức giống ứng dụng Office. Excel hiển thị tối đa 200 hàng và 50 cột của sheet được chọn, dùng giá trị đã lưu trong file; không tính lại công thức. Văn bản giới hạn 2 MB đầu. DOC/XLS/PPT đời cũ, TIFF và các định dạng nén ngoài ZIP vẫn dùng **Tải file**.
+
+File được lấy qua API tải file có sẵn và giữ trong bộ nhớ trình duyệt; xem trước không công khai URL Cloudinary, không gửi tài liệu sang dịch vụ xem bên ngoài. Quyền giảng viên/sinh viên và mã bí mật vẫn được backend kiểm tra. Mã tra cứu gửi bằng POST, không nằm trong URL. Cửa sổ có trạng thái tải, báo lỗi và thử lại; đóng cửa sổ sẽ hủy yêu cầu đang chờ và thu hồi URL tạm. Thư viện đọc Office chỉ tải khi cần. Không cần API hoặc biến môi trường mới cho chức năng này.
+
 ## Triển khai
 
 Trên Vercel, chọn Framework Preset **Vite**, Build Command `yarn build`, Output Directory `dist`. Root Directory để trống nếu repo chỉ chứa frontend; đặt `client` nếu repo chứa cả client và server. File `vercel.json` nằm cùng `package.json` và rewrite các đường dẫn về `/index.html`, giúp React Router xử lý khi mở link trực tiếp hoặc reload `/lookup`, `/specialized/login`, `/lecturer/...`.

@@ -297,6 +297,8 @@ export default function SpecializedSubmissionsPage() {
                       )}
                       <FileList
                         files={v.files}
+                        access={{ kind: 'lecturer', submissionId: selected! }}
+                        version={v.version}
                         action={(f, i) => (
                           <Button
                             size="small"

@@ -20,6 +20,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import type { ReactNode } from 'react';
 import type { AssignmentStatus, SubmissionFile } from '../lib/types';
 import { errorMessage } from '../lib/api';
+import type { SubmissionFileAccess } from '../lib/api';
+import SubmissionFilePreview from './SubmissionFilePreview';
 import { extensionColors, formatBytes, imageExtensions } from '../lib/utils';
 import { brand } from '../lib/brand';
 
@@ -207,14 +209,21 @@ export function FileIcon({
 export function FileList({
   files,
   action,
+  access,
+  version,
 }: {
   files: SubmissionFile[];
   action?: (file: SubmissionFile, index: number) => ReactNode;
+  access?: SubmissionFileAccess;
+  version?: number;
 }) {
   return (
     <div className="file-list">
       {files.map((file, index) => (
-        <div className="file-row" key={`${file.originalName}-${index}`}>
+        <div
+          className="file-row flex-wrap sm:flex-nowrap"
+          key={`${file.originalName}-${index}`}
+        >
           <FileIcon format={file.format} />
           <div className="min-w-0 flex-1">
             <div className="font-medium break-words">{file.originalName}</div>
@@ -222,7 +231,19 @@ export function FileList({
               {formatBytes(file.bytes)} · {file.format.toUpperCase()}
             </div>
           </div>
-          {action?.(file, index)}
+          {(action || (access && version !== undefined)) && (
+            <div className="flex w-full flex-wrap items-center justify-end gap-2 sm:w-auto">
+              {access && version !== undefined && (
+                <SubmissionFilePreview
+                  file={file}
+                  access={access}
+                  version={version}
+                  fileIndex={index}
+                />
+              )}
+              {action?.(file, index)}
+            </div>
+          )}
         </div>
       ))}
     </div>

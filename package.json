@@ -33,12 +33,15 @@
     "antd": "^6.0.0",
     "axios": "^1.0.0",
     "dayjs": "^1.11.0",
+    "dompurify": "^3.5.0",
     "fflate": "^0.8.2",
     "lottie-web": "^5.13.0",
+    "mammoth": "^1.13.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "react-markdown": "^10.1.0",
     "react-router-dom": "^7.0.0",
+    "read-excel-file": "^9.3.20",
     "remark-gfm": "^4.0.1"
   },
   "devDependencies": {

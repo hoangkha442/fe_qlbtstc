@@ -511,6 +511,11 @@ export default function SourceAssignmentPage() {
                             )}
                             <FileList
                               files={v.files}
+                              access={{
+                                kind: 'student',
+                                submissionId: mine.data!._id,
+                              }}
+                              version={v.version}
                               action={(f, i) => (
                                 <Button
                                   icon={<DownloadOutlined />}

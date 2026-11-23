@@ -109,6 +109,60 @@ export function saveBlob(blob: Blob, filename: string) {
   anchor.remove();
   window.setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
+
+export type SubmissionFileAccess =
+  | { kind: 'lecturer' | 'student'; submissionId: string }
+  | { kind: 'receipt'; receiptCode: string; secret: string };
+
+export async function fetchSubmissionFile(
+  access: SubmissionFileAccess,
+  version: number,
+  fileIndex: number,
+  signal: AbortSignal,
+) {
+  try {
+    const options = { responseType: 'blob' as const, timeout: 180000, signal };
+    const response =
+      access.kind === 'receipt'
+        ? await api.post<Blob>(
+            '/public/receipts/file',
+            {
+              receiptCode: access.receiptCode,
+              secret: access.secret,
+              version,
+              fileIndex,
+            },
+            options,
+          )
+        : await api.get<Blob>(
+            `/${access.kind}/submissions/${access.submissionId}/file`,
+            { ...options, params: { version, fileIndex } },
+          );
+    if (response.data.size > 10 * 1024 * 1024)
+      throw new Error('File vượt dung lượng hỗ trợ xem trước (10 MB).');
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response?.data instanceof Blob) {
+      const parsed = await error.response.data.text();
+      try {
+        const result = JSON.parse(parsed) as { message?: string | string[] };
+        if (result.message)
+          throw new Error(
+            Array.isArray(result.message)
+              ? result.message.join('. ')
+              : result.message,
+          );
+      } catch (parsedError) {
+        if (
+          parsedError instanceof Error &&
+          !(parsedError instanceof SyntaxError)
+        )
+          throw parsedError;
+      }
+    }
+    throw error;
+  }
+}
 export async function download(
   path: string,
   filename: string,

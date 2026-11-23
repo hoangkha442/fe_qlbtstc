@@ -504,6 +504,8 @@ export default function SubmissionsPage() {
                       </p>
                       <FileList
                         files={v.files}
+                        access={{ kind: 'lecturer', submissionId: selectedId! }}
+                        version={v.version}
                         action={(f, index) => (
                           <Tooltip title="Tải file">
                             <Button

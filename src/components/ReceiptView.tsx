@@ -238,7 +238,20 @@ export default function ReceiptView({
         />
         <GradeDisplay grade={receipt.grade} />
         <h3 className="mt-7 mb-4">File đã nộp</h3>
-        <FileList files={receipt.files} action={fileAction(receipt.version)} />
+        <FileList
+          files={receipt.files}
+          access={
+            code
+              ? {
+                  kind: 'receipt',
+                  receiptCode: receipt.receiptCode,
+                  secret: code,
+                }
+              : undefined
+          }
+          version={receipt.version}
+          action={fileAction(receipt.version)}
+        />
         {receipt.note && (
           <div className="mt-5 text-muted">Ghi chú: {receipt.note}</div>
         )}
@@ -311,7 +324,20 @@ export default function ReceiptView({
                   {v.email && (
                     <p className="mb-3 text-sm text-muted">Email: {v.email}</p>
                   )}
-                  <FileList files={v.files} action={fileAction(v.version)} />
+                  <FileList
+                    files={v.files}
+                    access={
+                      code
+                        ? {
+                            kind: 'receipt',
+                            receiptCode: receipt.receiptCode,
+                            secret: code,
+                          }
+                        : undefined
+                    }
+                    version={v.version}
+                    action={fileAction(v.version)}
+                  />
                   <GradeDisplay grade={v.grade} />
                 </div>
               ),
