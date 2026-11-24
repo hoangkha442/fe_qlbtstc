@@ -182,6 +182,9 @@ export interface LearningResource {
   url: string;
   kind: 'document' | 'source_code' | 'link';
 }
+export interface LessonFile extends SubmissionFile {
+  id: string;
+}
 export interface LessonOutline extends Entity {
   assignments?: SourceAssignment[];
   pathId: string;
@@ -201,6 +204,7 @@ export interface Lesson extends LessonOutline {
   content: string;
   videoUrl?: string;
   resources: LearningResource[];
+  files: LessonFile[];
   enrolled?: boolean;
 }
 export interface LearningModule<T = Lesson> extends Entity {

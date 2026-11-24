@@ -28,6 +28,9 @@ export default function FilePreviewModal({
     'submissionId' in access ? access.submissionId : undefined;
   const receiptCode = 'receiptCode' in access ? access.receiptCode : undefined;
   const secret = 'secret' in access ? access.secret : undefined;
+  const role = access.kind === 'lesson' ? access.role : undefined;
+  const lessonId = access.kind === 'lesson' ? access.lessonId : undefined;
+  const fileId = access.kind === 'lesson' ? access.fileId : undefined;
   useEffect(() => {
     const controller = new AbortController();
     setBlob(undefined);
@@ -35,7 +38,9 @@ export default function FilePreviewModal({
     const current: SubmissionFileAccess =
       kind === 'receipt'
         ? { kind, receiptCode: receiptCode!, secret: secret! }
-        : { kind, submissionId: submissionId! };
+        : kind === 'lesson'
+          ? { kind, role: role!, lessonId: lessonId!, fileId: fileId! }
+          : { kind, submissionId: submissionId! };
     void fetchSubmissionFile(current, version, fileIndex, controller.signal)
       .then((value) => {
         if (!controller.signal.aborted) setBlob(value);
@@ -44,7 +49,18 @@ export default function FilePreviewModal({
         if (!controller.signal.aborted) setError(errorMessage(reason));
       });
     return () => controller.abort();
-  }, [kind, submissionId, receiptCode, secret, version, fileIndex, attempt]);
+  }, [
+    kind,
+    submissionId,
+    receiptCode,
+    secret,
+    role,
+    lessonId,
+    fileId,
+    version,
+    fileIndex,
+    attempt,
+  ]);
   return (
     <Modal
       open
@@ -52,7 +68,9 @@ export default function FilePreviewModal({
         <span className="break-words">
           {file.originalName}{' '}
           <span className="text-sm font-normal text-muted">
-            · Phiên bản {version}
+            {kind === 'lesson'
+              ? '· Tài liệu bài học'
+              : `· Phiên bản ${version}`}
           </span>
         </span>
       }

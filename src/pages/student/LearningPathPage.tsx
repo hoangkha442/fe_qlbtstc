@@ -18,6 +18,7 @@ import { BackButton, QueryState } from '../../components/common';
 import { LearningText, LessonVideo } from '../../components/LearningContent';
 import { duration, levels, safeHttps } from '../../lib/learning';
 import StudentAssignmentsPanel from '../../components/StudentAssignmentsPanel';
+import LessonFiles from '../../components/LessonFiles';
 
 export default function LearningPathPage() {
   const { pathId = '', lessonId } = useParams();
@@ -289,8 +290,14 @@ export default function LearningPathPage() {
                               <LockOutlined /> Tài liệu được mở sau khi giảng
                               viên ghi danh.
                             </p>
-                          ) : lesson.data.resources.length ? (
+                          ) : lesson.data.resources.length ||
+                            lesson.data.files?.length ? (
                             <div className="space-y-3">
+                              <LessonFiles
+                                files={lesson.data.files ?? []}
+                                lessonId={lesson.data._id}
+                                role="student"
+                              />
                               {lesson.data.resources.map((resource, i) => (
                                 <div key={i} className="learning-resource">
                                   <FileTextOutlined />

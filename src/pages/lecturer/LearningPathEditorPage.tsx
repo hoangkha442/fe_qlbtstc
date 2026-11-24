@@ -42,6 +42,11 @@ import { SpecializedAssignmentsPanel } from './SpecializedAssignmentsPage';
 import AssignmentAttachments from '../../components/AssignmentAttachments';
 import RichTextEditor from '../../components/RichTextEditor';
 import { attachmentsPayload } from '../../lib/assignments';
+import type { UploadFile } from 'antd';
+import type { LessonFile } from '../../lib/types';
+import LessonFiles from '../../components/LessonFiles';
+import LessonFileUpload from '../../components/LessonFileUpload';
+import { appendSubmissionFiles } from '../../lib/submission';
 import type { AssignmentAttachmentsDraft } from '../../lib/assignments';
 
 type ModuleFields = AssignmentAttachmentsDraft & {
@@ -80,6 +85,8 @@ export default function LearningPathEditorPage() {
     lesson?: Lesson;
   }>();
   const [busy, setBusy] = useState(false);
+  const [lessonUploads, setLessonUploads] = useState<UploadFile[]>([]);
+  const [retainedFiles, setRetainedFiles] = useState<LessonFile[]>([]);
   const [rowBusy, setRowBusy] = useState('');
   const [error, setError] = useState('');
   const [moduleForm] = Form.useForm<ModuleFields>();
@@ -132,6 +139,8 @@ export default function LearningPathEditorPage() {
     setError('');
   }
   function editLesson(moduleId: string, lesson?: Lesson) {
+    setLessonUploads([]);
+    setRetainedFiles(lesson?.files ?? []);
     lessonForm.resetFields();
     lessonForm.setFieldsValue({
       ...(lesson
@@ -210,18 +219,31 @@ export default function LearningPathEditorPage() {
         ...attachmentsPayload(values),
         title: values.title.trim(),
         resources: values.resources ?? [],
+        keepFileIds: retainedFiles.map((file) => file.id),
         ...(videoUrl?.trim()
           ? { videoUrl: videoUrl.trim() }
           : lessonEditor.lesson?.videoUrl
             ? { removeVideo: true }
             : {}),
       };
+      let body: typeof data | FormData = data;
+      if (lessonUploads.length) {
+        body = new FormData();
+        body.append('data', JSON.stringify(data));
+        appendSubmissionFiles(
+          body,
+          lessonUploads.map((file) => (file.originFileObj ?? file) as File),
+        );
+      }
       if (lessonEditor.lesson)
-        await api.patch(`/lecturer/lessons/${lessonEditor.lesson._id}`, data);
+        await api.patch(`/lecturer/lessons/${lessonEditor.lesson._id}`, body, {
+          timeout: 180000,
+        });
       else
         await api.post(
           `/lecturer/learning-modules/${lessonEditor.moduleId}/lessons`,
-          data,
+          body,
+          { timeout: 180000 },
         );
       await refresh();
       setLessonEditor(undefined);
@@ -455,8 +477,11 @@ export default function LearningPathEditorPage() {
                                             )}
                                             <span className="text-xs text-muted">
                                               {duration(lesson.durationSeconds)}{' '}
-                                              · {lesson.resources.length} tài
-                                              liệu
+                                              ·{' '}
+                                              {lesson.resources.length +
+                                                (lesson.files?.length ??
+                                                  0)}{' '}
+                                              tài liệu
                                             </span>
                                           </div>
                                         </div>
@@ -719,6 +744,28 @@ export default function LearningPathEditorPage() {
             </Form.Item>
           </div>
           <h3 className="mb-4">Tài liệu & mã nguồn</h3>
+          {lessonEditor?.lesson && retainedFiles.length > 0 && (
+            <div className="mb-4">
+              <LessonFiles
+                files={retainedFiles}
+                lessonId={lessonEditor.lesson._id}
+                role="lecturer"
+                disabled={busy}
+                onRemove={(id) =>
+                  setRetainedFiles((files) =>
+                    files.filter((file) => file.id !== id),
+                  )
+                }
+              />
+            </div>
+          )}
+          <LessonFileUpload
+            value={lessonUploads}
+            onChange={setLessonUploads}
+            existingCount={retainedFiles.length}
+            disabled={busy}
+          />
+          <h4 className="mb-3 font-semibold">Liên kết tài liệu</h4>
           <Form.List name="resources">
             {(fields, { add, remove }) => (
               <>

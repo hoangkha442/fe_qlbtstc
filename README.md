@@ -76,6 +76,12 @@ Phần **Chuyên ngành** có:
 
 Sinh viên chỉ thấy nội dung khi lộ trình, chương và bài học đều được công bố và chưa lưu trữ. Bật **Cho phép xem trước** ở bài học để sinh viên đã đăng nhập có thể xem nội dung/video trước khi ghi danh; tài liệu vẫn cần ghi danh.
 
+## Upload tài liệu bài học
+
+Trong tạo/sửa bài học, phần **Tài liệu & mã nguồn** có ô kéo thả nhiều file, danh sách file đã lưu và khu vực liên kết HTTPS. File mới chỉ upload khi bấm **Lưu bài học**, tối đa tổng cộng 10 file, 10 MB/file. Chấp nhận Office, PDF, ảnh, ZIP/RAR/7z/TAR/GZ và mã nguồn phổ biến. Bấm nút gỡ trên file cũ rồi lưu bài học để xóa đính kèm; hủy chỉnh sửa giữ nguyên file đã lưu. Các liên kết tài liệu hiện có tiếp tục sử dụng như trước.
+
+Sinh viên đã ghi danh mở bài học để tải file hoặc xem trước định dạng được hỗ trợ. RAR/7z và định dạng chưa có bộ xem trực tiếp dùng nút tải file. Sinh viên chỉ xem thử nội dung/video chưa được truy cập tài liệu. Upload, tải và xem file đều dùng JWT qua backend; không công khai file Cloudinary. Cần triển khai cả backend và frontend cho chức năng này.
+
 ## Đường dẫn
 
 Hai không gian theo vai trò dùng cùng typography, màu sắc và logo Hoàng Kha Learning:

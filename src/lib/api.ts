@@ -111,6 +111,12 @@ export function saveBlob(blob: Blob, filename: string) {
 }
 
 export type SubmissionFileAccess =
+  | {
+      kind: 'lesson';
+      role: 'lecturer' | 'student';
+      lessonId: string;
+      fileId: string;
+    }
   | { kind: 'lecturer' | 'student'; submissionId: string }
   | { kind: 'receipt'; receiptCode: string; secret: string };
 
@@ -134,10 +140,15 @@ export async function fetchSubmissionFile(
             },
             options,
           )
-        : await api.get<Blob>(
-            `/${access.kind}/submissions/${access.submissionId}/file`,
-            { ...options, params: { version, fileIndex } },
-          );
+        : access.kind === 'lesson'
+          ? await api.get<Blob>(
+              `/${access.role}/lessons/${access.lessonId}/files/${access.fileId}`,
+              options,
+            )
+          : await api.get<Blob>(
+              `/${access.kind}/submissions/${access.submissionId}/file`,
+              { ...options, params: { version, fileIndex } },
+            );
     if (response.data.size > 10 * 1024 * 1024)
       throw new Error('File vượt dung lượng hỗ trợ xem trước (10 MB).');
     return response.data;
