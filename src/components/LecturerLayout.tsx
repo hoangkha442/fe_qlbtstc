@@ -12,6 +12,7 @@ import {
   TeamOutlined,
   DownOutlined,
   CodeOutlined,
+  BarChartOutlined,
   UserOutlined,
 } from '@ant-design/icons';
 import { Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom';
@@ -57,6 +58,11 @@ const navigation = [
         icon: <FileDoneOutlined />,
         label: 'Bài đã nộp',
       },
+      {
+        key: '/lecturer/submission-summary',
+        icon: <BarChartOutlined />,
+        label: 'Tổng hợp theo lớp',
+      },
     ],
   },
   {
@@ -94,6 +100,7 @@ const titles: Record<string, string> = {
   'course-sections': 'Lớp học phần',
   assignments: 'Bài tập',
   submissions: 'Bài đã nộp',
+  'submission-summary': 'Tổng hợp theo lớp',
   students: 'Tài khoản sinh viên',
   'learning-paths': 'Lộ trình & bài học',
   'specialized-assignments': 'Bài tập mã nguồn',

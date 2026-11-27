@@ -7,6 +7,7 @@ import {
   FileTextOutlined,
   PlusOutlined,
   ReadOutlined,
+  BarChartOutlined,
 } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import { get } from '../../lib/api';
@@ -38,11 +39,18 @@ export default function DashboardPage() {
         title="Tổng quan"
         description="Thống kê bài tập và bài nộp Đại cương."
         extra={
-          <Link to="/lecturer/assignments?create=1">
-            <Button type="primary" size="large" icon={<PlusOutlined />}>
-              Tạo bài tập
-            </Button>
-          </Link>
+          <>
+            <Link to="/lecturer/submission-summary">
+              <Button size="large" icon={<BarChartOutlined />}>
+                Tổng hợp theo lớp
+              </Button>
+            </Link>
+            <Link to="/lecturer/assignments?create=1">
+              <Button type="primary" size="large" icon={<PlusOutlined />}>
+                Tạo bài tập
+              </Button>
+            </Link>
+          </>
         }
       />
       <QueryState

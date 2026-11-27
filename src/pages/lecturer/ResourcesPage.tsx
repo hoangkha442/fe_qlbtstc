@@ -11,6 +11,7 @@ import {
   Space,
   Table,
   Tag,
+  Tooltip,
 } from 'antd';
 import {
   EditOutlined,
@@ -18,8 +19,9 @@ import {
   PlusOutlined,
   ReloadOutlined,
   UndoOutlined,
+  BarChartOutlined,
 } from '@ant-design/icons';
-import { Navigate, useParams } from 'react-router-dom';
+import { Link, Navigate, useParams } from 'react-router-dom';
 import type { ColumnsType } from 'antd/es/table';
 import { allPages, api, errorMessage, get } from '../../lib/api';
 import type {
@@ -255,9 +257,28 @@ function ResourceView({ resource }: { resource: Resource }) {
     {
       title: 'THAO TÁC',
       key: 'actions',
-      width: 160,
+      width:
+        resource === 'classes' || resource === 'course-sections' ? 210 : 160,
       render: (_, row) => (
         <Space>
+          {(resource === 'classes' || resource === 'course-sections') && (
+            <Tooltip title="Tổng hợp nộp bài">
+              <Link
+                to={
+                  resource === 'classes'
+                    ? `/lecturer/submission-summary?classId=${row._id}`
+                    : 'classId' in row
+                      ? `/lecturer/submission-summary?classId=${refId(row.classId)}&semesterId=${refId(row.semesterId)}&courseSectionId=${row._id}`
+                      : '/lecturer/submission-summary'
+                }
+              >
+                <Button
+                  icon={<BarChartOutlined />}
+                  aria-label={`Tổng hợp nộp bài ${row.name}`}
+                />
+              </Link>
+            </Tooltip>
+          )}
           <Button
             aria-label={`Sửa ${row.name}`}
             icon={<EditOutlined />}

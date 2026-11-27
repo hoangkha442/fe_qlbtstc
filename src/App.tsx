@@ -17,6 +17,9 @@ const DashboardPage = lazy(() => import('./pages/lecturer/DashboardPage'));
 const ResourcesPage = lazy(() => import('./pages/lecturer/ResourcesPage'));
 const AssignmentsPage = lazy(() => import('./pages/lecturer/AssignmentsPage'));
 const SubmissionsPage = lazy(() => import('./pages/lecturer/SubmissionsPage'));
+const SubmissionSummaryPage = lazy(
+  () => import('./pages/lecturer/SubmissionSummaryPage'),
+);
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 const StudentLoginPage = lazy(() => import('./pages/student/StudentLoginPage'));
 const ChangePasswordPage = lazy(
@@ -135,6 +138,10 @@ function AppRoutes() {
             <Route path="dashboard" element={<DashboardPage />} />
             <Route path="assignments" element={<AssignmentsPage />} />
             <Route path="submissions" element={<SubmissionsPage />} />
+            <Route
+              path="submission-summary"
+              element={<SubmissionSummaryPage />}
+            />
             <Route path="students" element={<StudentsPage />} />
             <Route
               path="learning-paths"

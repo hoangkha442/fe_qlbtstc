@@ -127,6 +127,16 @@ Chuyên ngành: mở bài tập → Bài đã nộp & điểm → Nộp lại b�
 
 Cả hai luồng chỉ nộp lại khi giảng viên đã bật Cho nộp lại và bài còn nhận bài. Khi không được phép, giao diện khóa nút và nêu lý do. Nộp lại tạo phiên bản mới chưa chấm, giữ bản/điểm cũ trong lịch sử; thử lại yêu cầu lỗi vẫn dùng cùng key và nội dung để tránh tạo trùng phiên bản.
 
+## Tổng hợp nộp bài theo lớp
+
+Giảng viên mở **Đại cương → Tổng hợp theo lớp**, hoặc nút thống kê tại danh sách Lớp/Lớp học phần. Chọn lớp để tải dữ liệu; học kỳ và học phần mặc định là **Tất cả**. Có thể tính cả bài tập lưu trữ, tìm MSSV/họ tên/email và lọc sinh viên đã nộp đủ hoặc còn thiếu bài.
+
+Bảng hiển thị số bài đã nộp/tổng bài, tỷ lệ, số bài chưa nộp và quá hạn chưa nộp. Mỗi bài tập chỉ tính một lần dù nộp lại nhiều phiên bản; các bài chưa mở vẫn nằm trong tổng bài tập và được ghi rõ. Khi tổng bài bằng 0, tỷ lệ để trống, không đánh dấu đã nộp đủ. Thẻ tổng quan tính trên toàn phạm vi lớp/học kỳ/học phần; tìm kiếm và lọc tiến độ chỉ lọc danh sách sinh viên.
+
+Danh sách dựa trên MSSV đã từng có bài nộp hoàn tất trong phạm vi được chọn, kể cả chỉ từng nộp bài đã lưu trữ. Đại cương chưa có danh sách lớp nên chưa thể liệt kê người chưa nộp lần nào. Thông tin này hiển thị ngay trên trang. MSSV được gộp xuyên các học phần trong cùng lớp; tên/email lấy từ bài nộp gần nhất trong phạm vi.
+
+Mở **Chi tiết** để xem từng bài, hạn nộp, trạng thái, phiên bản mới nhất và chuyển sang bài nộp để xem/chấm. **Xuất Excel** lấy toàn bộ sinh viên khớp bộ lọc, không chỉ trang hiện tại; file kèm thông tin phạm vi và cách tính. Các API yêu cầu phiên giảng viên. Cần deploy cả backend và frontend, không có biến môi trường mới.
+
 ## Chấm điểm và kết quả học tập
 
 Trong Bài nộp Đại cương hoặc Bài nộp mã nguồn, giảng viên mở chi tiết, chọn Chấm điểm tại phiên bản cần chấm, nhập điểm thang 10 và nhận xét rồi Lưu điểm. Ô gửi email mặc định không chọn; nếu chọn, hệ thống gửi tới email hiển thị của phiên bản đó. Thông báo phân biệt lưu điểm thành công với lưu điểm nhưng gửi email thất bại. Khi có xung đột cập nhật, dữ liệu được tải lại để chấm tiếp từ điểm mới nhất.
